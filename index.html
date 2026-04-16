@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finansal Takip Sistemi</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-wallet"></i>
+                <h2>FinansTracker</h2>
+            </div>
+            <nav class="menu">
+                <a href="#" class="active"><i class="fa-solid fa-chart-pie"></i> Özet</a>
+                <a href="#"><i class="fa-solid fa-cloud-arrow-up"></i> Yedekleme</a>
+                <a href="#"><i class="fa-solid fa-gear"></i> Ayarlar</a>
+            </nav>
+            <button id="auth-btn" class="google-btn">
+                <i class="fa-brands fa-google"></i> Drive ile Giriş Yap
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Hoş Geldiniz 👋</h1>
+                <p>Finansal durumunuzu buradan yönetebilirsiniz.</p>
+            </header>
+
+            <section class="dashboard-cards">
+                <div class="card balance-card">
+                    <h3>Toplam Bakiye</h3>
+                    <h2 id="total-balance">₺0.00</h2>
+                </div>
+                <div class="card income-card">
+                    <h3><i class="fa-solid fa-arrow-trend-up"></i> Gelirler</h3>
+                    <h2 id="total-income">₺0.00</h2>
+                </div>
+                <div class="card expense-card">
+                    <h3><i class="fa-solid fa-arrow-trend-down"></i> Giderler</h3>
+                    <h2 id="total-expense">₺0.00</h2>
+                </div>
+            </section>
+
+            <div class="content-grid">
+                <section class="transaction-form-section">
+                    <h3>Yeni İşlem Ekle</h3>
+                    <form id="transaction-form">
+                        <div class="form-group">
+                            <label for="text">İşlem Adı (Örn: Kira, Maaş)</label>
+                            <input type="text" id="text" placeholder="Ne için?" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Tutar (Gider için başına '-' koyun)</label>
+                            <input type="number" id="amount" placeholder="Örn: -5000 veya 15000" required>
+                        </div>
+                        <button type="submit" class="btn-primary">İşlemi Ekle</button>
+                    </form>
+                </section>
+
+                <section class="transaction-history-section">
+                    <h3>Son İşlemler</h3>
+                    <ul id="transaction-list" class="transaction-list">
+                        </ul>
+                </section>
+            </div>
+        </main>
+    </div>
+	<script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>

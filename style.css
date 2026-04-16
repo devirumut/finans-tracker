@@ -1,0 +1,311 @@
+/* --- TEMEL AYARLAR VE DEĞİŞKENLER --- */
+:root {
+    --primary-color: #4a6cf7;
+    --primary-hover: #3a56c4;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --bg-color: #f4f7fe;
+    --text-main: #2b3674;
+    --text-muted: #a3aed1;
+    --sidebar-bg: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --soft-shadow: 0 18px 40px rgba(112, 144, 176, 0.12);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- ANA YAPI VE LAYOUT --- */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR (SOL MENÜ) --- */
+.sidebar {
+    width: 280px;
+    background-color: var(--sidebar-bg);
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--primary-color);
+    margin-bottom: 50px;
+    font-size: 1.2rem;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.menu a {
+    text-decoration: none;
+    color: var(--text-muted);
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.menu a:hover, .menu a.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 10px 20px rgba(74, 108, 247, 0.2);
+}
+
+.google-btn {
+    background-color: white;
+    color: var(--text-main);
+    border: 1px solid #e2e8f0;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: var(--soft-shadow);
+}
+
+.google-btn:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* --- ANA İÇERİK ALANI --- */
+.main-content {
+    flex: 1;
+    padding: 40px 50px;
+    overflow-y: auto;
+}
+
+header {
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+header p {
+    color: var(--text-muted);
+    margin-top: 5px;
+}
+
+/* --- DASHBOARD KARTLARI (Bakiye, Gelir, Gider) --- */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(15px); /* Glassmorphism efekti */
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+}
+
+.card h3 {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.balance-card h2 { color: var(--primary-color); }
+.income-card h2 { color: var(--success-color); }
+.expense-card h2 { color: var(--danger-color); }
+
+/* --- İÇERİK IZGARASI (Form ve Liste) --- */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 30px;
+}
+
+section h3 {
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    color: var(--text-main);
+}
+
+/* --- FORM TASARIMI --- */
+.transaction-form-section, .transaction-history-section {
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 15px rgba(74, 108, 247, 0.3);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* --- LİSTE TASARIMI --- */
+.transaction-list {
+    list-style: none;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Scrollbar Tasarımı */
+.transaction-list::-webkit-scrollbar { width: 6px; }
+.transaction-list::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s;
+}
+
+.transaction-item:hover {
+    background-color: #f8fafc;
+    border-radius: 10px;
+    border-bottom-color: transparent;
+}
+
+.transaction-info span {
+    display: block;
+    font-weight: 600;
+}
+
+.transaction-info small {
+    color: var(--text-muted);
+}
+
+.transaction-amount {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.amount-plus { color: var(--success-color); }
+.amount-minus { color: var(--danger-color); }
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    margin-left: 15px;
+    transition: color 0.3s;
+}
+
+.delete-btn:hover { color: var(--danger-color); }
+
+/* --- MOBİL UYUMLULUK (Responsive) --- */
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        padding: 20px;
+        box-shadow: none;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .menu {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+    .google-btn {
+        margin-top: 20px;
+    }
+    .main-content {
+        padding: 20px;
+    }
+}
