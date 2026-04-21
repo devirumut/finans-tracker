@@ -1766,3 +1766,107 @@ body.dark-mode .btn-text:hover { background: rgba(255,255,255,0.1); }
     from { opacity: 0; transform: translateY(-15px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* ========================================= */
+/* 📱 MOBİL UYUM (RESPONSIVE) YAMASI 📱 */
+/* ========================================= */
+
+@media (max-width: 850px) {
+    
+    /* 1. ANA EKRAN KİLİTLERİNİ AÇIYORUZ */
+    body, html, .main-content {
+        height: auto !important;
+        overflow-y: auto !important; /* Mobilde sayfanın tamamen kayabilmesini sağlar */
+    }
+
+    /* 2. ANA DİZİLİMİ ALT ALTA (COLUMN) YAPIYORUZ */
+    .container {
+        flex-direction: column !important; /* Menüyü üste, paneli alta alır */
+        height: auto !important;
+    }
+
+    /* 3. SOL MENÜYÜ ÜSTTE YATAY KAYDIRILABİLİR BİR MENÜYE ÇEVİRİYORUZ */
+    aside, .sidebar {
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 15px !important;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border-right: none !important;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    /* Menü Butonları Yan Yana Dizilsin ve Yana Kaysın */
+    .menu {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        white-space: nowrap;
+        padding-bottom: 10px;
+        scrollbar-width: none; /* Firefox için barı gizler */
+    }
+    .menu::-webkit-scrollbar { display: none; } /* Chrome/Safari için barı gizler */
+
+    .menu a {
+        flex: 0 0 auto; /* Butonların ezilmesini önler */
+        margin-bottom: 0 !important;
+        margin-right: 10px;
+    }
+
+    /* 4. ÖZET EKRANI KARTLARI (BAKİYE, GELİR, GİDER) */
+    .dashboard-cards {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    /* 5. FORMLARI ALT ALTA DİZ (İşlem Ekleme, Kategori Ekleme) */
+    .horizontal-form {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    form.horizontal-form, #subscription-form, #category-form {
+        grid-template-columns: 1fr !important; /* Yan yana kutuları alt alta dizer */
+    }
+
+    /* 6. ALT PANEL (TABLO VE GRAFİK) */
+    .bottom-split-area {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .history-card {
+        width: 100% !important;
+        max-height: 400px !important; /* Mobilde sonsuza uzamasını engeller */
+        flex: none !important;
+    }
+
+    .chart-box {
+        width: 100% !important;
+        flex: none !important;
+        margin-top: 15px;
+    }
+
+    /* 7. AYARLAR MENÜSÜ DÜZENLEMELERİ */
+    #tab-general > div > div:nth-child(2) {
+        grid-template-columns: 1fr !important; /* Tema ve Para birimi alt alta gelir */
+        gap: 20px !important;
+    }
+
+    .settings-tabs {
+        flex-wrap: wrap !important;
+    }
+    .settings-tab-btn {
+        flex: 1 1 100% !important; /* Ayarlar sekmeleri alt alta büyük butonlar olur */
+    }
+
+    /* 8. MODAL (AÇILIR PENCERELER) */
+    .modal-content {
+        width: 90% !important;
+        padding: 20px !important;
+    }
+    
+    .horizontal-form button {
+        height: 50px !important; /* Telefonda parmakla tıklamayı kolaylaştırır */
+    }
+}
