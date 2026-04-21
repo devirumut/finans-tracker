@@ -1771,102 +1771,139 @@ body.dark-mode .btn-text:hover { background: rgba(255,255,255,0.1); }
 /* 📱 MOBİL UYUM (RESPONSIVE) YAMASI 📱 */
 /* ========================================= */
 
+/* ========================================= */
+/* 📱 MOBİL UYUM (GERÇEK APP GÖRÜNÜMÜ) 📱 */
+/* ========================================= */
+
 @media (max-width: 850px) {
     
-    /* 1. ANA EKRAN KİLİTLERİNİ AÇIYORUZ */
-    body, html, .main-content {
+    /* 1. EKRAN KİLİDİNİ AÇ VE ALT MENÜ İÇİN BOŞLUK BIRAK */
+    body, html {
         height: auto !important;
-        overflow-y: auto !important; /* Mobilde sayfanın tamamen kayabilmesini sağlar */
+        overflow-y: auto !important; 
     }
-
-    /* 2. ANA DİZİLİMİ ALT ALTA (COLUMN) YAPIYORUZ */
+    
     .container {
-        flex-direction: column !important; /* Menüyü üste, paneli alta alır */
+        flex-direction: column !important;
         height: auto !important;
+        padding: 0 !important; /* Mobilde kenar boşluklarını sıfırlıyoruz */
     }
 
-    /* 3. SOL MENÜYÜ ÜSTTE YATAY KAYDIRILABİLİR BİR MENÜYE ÇEVİRİYORUZ */
-    aside, .sidebar {
+    .main-content {
+        padding: 15px 15px 90px 15px !important; /* Altta menü için 90px boşluk */
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* 2. SOL MENÜYÜ İPTAL ET -> EN ALTA SABİT APP MENÜSÜ YAP */
+    .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
         width: 100% !important;
-        min-height: auto !important;
-        padding: 15px !important;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        height: 70px !important;
+        background: var(--card-bg) !important;
         border-right: none !important;
-        border-bottom: 1px solid var(--glass-border);
+        border-top: 1px solid var(--glass-border);
+        z-index: 9999;
+        padding: 0 !important;
+        display: flex;
+        justify-content: center;
+        border-radius: 20px 20px 0 0; /* Üst köşeleri yumuşatılmış App Bar */
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
     }
 
-    /* Menü Butonları Yan Yana Dizilsin ve Yana Kaysın */
+    /* Mobilde Logo, Çıkış Butonu ve Profil Kısımlarını Gizle (Sadece butonlar kalsın) */
+    .sidebar-header, .user-profile-section, #logout-btn {
+        display: none !important;
+    }
+
+    /* Menü Butonlarının Tasarımı */
     .menu {
         display: flex !important;
         flex-direction: row !important;
-        overflow-x: auto !important;
-        white-space: nowrap;
-        padding-bottom: 10px;
-        scrollbar-width: none; /* Firefox için barı gizler */
+        width: 100%;
+        justify-content: space-around !important;
+        align-items: center;
+        height: 100%;
+        margin: 0 !important;
+        padding: 0 5px !important;
     }
-    .menu::-webkit-scrollbar { display: none; } /* Chrome/Safari için barı gizler */
 
     .menu a {
-        flex: 0 0 auto; /* Butonların ezilmesini önler */
-        margin-bottom: 0 !important;
-        margin-right: 10px;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 0.7rem !important; /* Mobilde yazı fontunu küçült */
+        padding: 5px !important;
+        margin: 0 !important;
+        border-radius: 10px;
+        gap: 5px;
+        background: transparent !important;
     }
 
-    /* 4. ÖZET EKRANI KARTLARI (BAKİYE, GELİR, GİDER) */
+    .menu a i { font-size: 1.3rem !important; transition: transform 0.2s; }
+    
+    /* Aktif menü butonunun ikonunu hafif büyüt ve renklendir */
+    .menu a.active { color: var(--primary-color) !important; }
+    .menu a.active i { transform: scale(1.2); }
+
+    /* 3. İÇERİK KARTLARINI MOBİLE UYDURMA */
     .dashboard-cards {
         flex-direction: column !important;
         gap: 15px !important;
     }
 
-    /* 5. FORMLARI ALT ALTA DİZ (İşlem Ekleme, Kategori Ekleme) */
+    /* Alt Alta Dizeceğimiz Formlar */
     .horizontal-form {
         display: flex !important;
         flex-direction: column !important;
+        gap: 10px !important;
     }
-    form.horizontal-form, #subscription-form, #category-form {
-        grid-template-columns: 1fr !important; /* Yan yana kutuları alt alta dizer */
+    
+    form.horizontal-form { grid-template-columns: 1fr !important; }
+    
+    .horizontal-form button {
+        width: 100% !important;
+        height: 50px !important; /* Telefonda parmakla tıklamayı kolaylaştırır */
     }
 
-    /* 6. ALT PANEL (TABLO VE GRAFİK) */
+    /* Tablo ve Grafiği Alt Alta Al */
     .bottom-split-area {
         flex-direction: column !important;
         height: auto !important;
+        align-items: stretch !important;
     }
 
     .history-card {
         width: 100% !important;
-        max-height: 400px !important; /* Mobilde sonsuza uzamasını engeller */
         flex: none !important;
+        max-height: 500px !important;
     }
 
     .chart-box {
         width: 100% !important;
         flex: none !important;
-        margin-top: 15px;
+        margin-top: 10px;
     }
 
-    /* 7. AYARLAR MENÜSÜ DÜZENLEMELERİ */
+    /* Ayarlar Menüsü Sekmelerini Alt Alta Al */
+    .settings-tabs { flex-direction: column !important; gap: 5px; }
+    .settings-tab-btn { width: 100% !important; text-align: left; padding: 15px !important;}
+    
     #tab-general > div > div:nth-child(2) {
-        grid-template-columns: 1fr !important; /* Tema ve Para birimi alt alta gelir */
+        grid-template-columns: 1fr !important;
         gap: 20px !important;
     }
 
-    .settings-tabs {
-        flex-wrap: wrap !important;
-    }
-    .settings-tab-btn {
-        flex: 1 1 100% !important; /* Ayarlar sekmeleri alt alta büyük butonlar olur */
-    }
-
-    /* 8. MODAL (AÇILIR PENCERELER) */
+    /* Açılır Pencereleri (Modal) Ekrana Sığdır */
     .modal-content {
-        width: 90% !important;
+        width: 95% !important;
         padding: 20px !important;
     }
     
-    .horizontal-form button {
-        height: 50px !important; /* Telefonda parmakla tıklamayı kolaylaştırır */
-    }
+    /* Notlar ızgarasını teke düşür */
+    #notes-grid { grid-template-columns: 1fr !important; }
 }
