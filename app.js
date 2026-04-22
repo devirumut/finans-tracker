@@ -720,3 +720,18 @@ initCategories();
 init();
 initSubscriptions();
 initNotes();
+
+// ==========================================
+// 17. PWA (MOBİL UYGULAMA) MOTORU KAYDI
+// ==========================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+                console.log('ServiceWorker başarıyla kaydedildi! Kapsam: ', registration.scope);
+            })
+            .catch(err => {
+                console.log('ServiceWorker kaydı başarısız oldu: ', err);
+            });
+    });
+}
