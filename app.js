@@ -989,41 +989,69 @@ if(scanBtn && cameraInput) {
         const file = e.target.files[0];
         if(!file) return;
         
-        showNotify("Yapay zeka fişi okuyor, lütfen bekleyin...", "fa-spinner fa-spin");
+        showNotify("Yapay zeka fişi inceliyor, saniyeler sürebilir...", "fa-spinner fa-spin");
         scanBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
         
         try {
-            // Tesseract ile resmi metne çevir (Türkçe dil desteğiyle)
+            // Tesseract işlemi başlat
             const result = await Tesseract.recognize(file, 'tur');
-            const text = result.data.text;
-            console.log("Okunan Fiş:", text); // Geliştirici konsoluna basar
+            const text = result.data.text.toUpperCase(); // Tüm harfleri büyüt
+            console.log("📄 Fişten Okunan Ham Metin:\n", text); 
             
-            // Metin içindeki muhtemel tutarları bul (Örn: 145,50 veya 145.50)
-            const amounts = text.match(/\d+[.,]\d{2}/g); 
+            // OCR hatalarını düzeltmek için gereksiz boşlukları temizle
+            const cleanText = text.replace(/\s+/g, ' '); 
+            
+            // Daha güçlü rakam bulucu: 15,50 | 1.250,50 | 1250.00 gibi tüm varyasyonları yakalar
+            const amounts = cleanText.match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g); 
             
             if(amounts && amounts.length > 0) {
-                // Bulunan sayılar arasında en büyüğünü "Toplam Tutar" olarak kabul et
                 let maxAmount = 0;
+                
                 amounts.forEach(amt => {
-                    let val = parseFloat(amt.replace(',', '.'));
-                    if(val > maxAmount) maxAmount = val;
+                    // "1.250,50" -> "1250.50" formatına çevirme garantisi
+                    let cleanAmt = amt;
+                    
+                    // Eğer hem nokta hem virgül varsa (örn: 1.250,50) noktayı sil, virgülü nokta yap
+                    if (cleanAmt.includes('.') && cleanAmt.includes(',')) {
+                        cleanAmt = cleanAmt.replace(/\./g, '').replace(',', '.');
+                    } 
+                    // Sadece virgül varsa (örn: 15,50) virgülü nokta yap
+                    else if (cleanAmt.includes(',')) {
+                        cleanAmt = cleanAmt.replace(',', '.');
+                    }
+                    // Sadece nokta varsa ve ondalık kısımsa (örn: 15.50) dokunma, binlikse (1.250) iptal et
+                    else if (cleanAmt.includes('.')) {
+                        if (cleanAmt.indexOf('.') !== cleanAmt.length - 3) {
+                            cleanAmt = cleanAmt.replace(/\./g, ''); 
+                        }
+                    }
+
+                    let val = parseFloat(cleanAmt);
+                    
+                    // Fişteki devasa barkod sayılarını elemek için makul bir sınır (örn: maks 200.000 TL)
+                    if(!isNaN(val) && val > maxAmount && val < 200000) {
+                        maxAmount = val;
+                    }
                 });
                 
-                document.getElementById('amount').value = maxAmount;
-                showNotify(`Fişten tutar okundu: ${maxAmount} ₺`, "fa-check-double");
+                if (maxAmount > 0) {
+                    document.getElementById('amount').value = maxAmount;
+                    showNotify(`Tutar başarıyla okundu: ${maxAmount} ₺`, "fa-check-double");
+                } else {
+                    showNotify("Makul bir tutar bulunamadı, elle giriniz.", "fa-triangle-exclamation");
+                }
             } else {
-                showNotify("Tutar net okunamadı, elle giriniz.", "fa-triangle-exclamation");
+                showNotify("Fişte rakam okunamadı, daha yakından çekin.", "fa-triangle-exclamation");
             }
         } catch (err) {
-            console.error(err);
-            showNotify("Fiş okuma hatası!", "fa-xmark");
+            console.error("OCR Hatası:", err);
+            showNotify("Okuma başarısız oldu!", "fa-xmark");
         }
         
         scanBtn.innerHTML = '<i class="fa-solid fa-camera"></i>';
         cameraInput.value = '';
     };
 }
-
 // ==========================================
 // 20. PROFESYONEL PDF RAPOR ÇIKTISI (ÖZEL TASARIM)
 // ==========================================
