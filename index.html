@@ -47,6 +47,7 @@
                 <a href="#" id="menu-calendar"><i class="fa-regular fa-calendar"></i> Takvim</a>
                 <a href="#" id="menu-yearly"><i class="fa-solid fa-calendar-days"></i> Yıllık Durum</a>
                 <a href="#" id="menu-notes"><i class="fa-solid fa-note-sticky"></i> Notlarım</a>
+                <a href="#" id="menu-warranties"><i class="fa-solid fa-shield-halved"></i> Garanti Kasası</a>
                 <a href="#" id="menu-settings"><i class="fa-solid fa-gear"></i> Ayarlar</a>
                 
                 <div style="margin-top: auto; padding-top: 20px; display: flex; gap: 10px;">
@@ -186,7 +187,10 @@
                     </div>
 
                     <div class="card chart-box">
-                        <h3><i class="fa-solid fa-chart-pie"></i> Gelir ve Gider Analizi</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="margin: 0;"><i class="fa-solid fa-chart-pie"></i> Gelir ve Gider Analizi</h3>
+                            <button id="open-sankey-btn" class="list-btn" style="width: auto; padding: 0 15px; background: rgba(74, 108, 247, 0.1); color: var(--primary-color); font-weight: bold;" title="Şelale Görünümü (Sankey)"><i class="fa-solid fa-water"></i> Şelale</button>
+                        </div>
                         <div class="chart-container"><canvas id="expenseChart"></canvas></div>
                     </div>
                 </div>
@@ -298,7 +302,52 @@
                 <div id="notes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; overflow-y: auto; flex: 1; padding-bottom: 20px;">
                     </div>
             </div>
+            <div id="warranties-view" style="display: none; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
+                <header class="header-section" style="margin-bottom: 10px;">
+                    <div>
+                        <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Garanti Kasası 🛡️</h1>
+                        <p style="color: var(--text-muted);">Cihazlarınızın fatura ve garanti belgelerini güvenle saklayın.</p>
+                    </div>
+                    <button id="add-warranty-btn" class="btn-primary" style="width: auto; padding: 10px 20px; background: #0f766e; box-shadow: 0 4px 15px rgba(15, 118, 110, 0.2);">
+                        <i class="fa-solid fa-plus"></i> Yeni Belge Ekle
+                    </button>
+                </header>
 
+                <div id="warranty-form-container" class="card premium-note-form" style="display: none; margin-bottom: 15px; border-top: 4px solid #0f766e;">
+                    <div class="note-form-header" style="background: rgba(15, 118, 110, 0.05); color: #0f766e;">
+                        <i class="fa-solid fa-file-shield"></i>
+                        <span>Yeni Garanti Kaydı</span>
+                    </div>
+                    <form id="warranty-form" class="horizontal-form" style="padding: 20px; grid-template-columns: 2fr 1fr 1fr; align-items: end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Ürün Adı / Model</label>
+                            <input type="text" id="war-name" placeholder="Örn: Samsung TV, Dyson Süpürge" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Garanti Bitiş Tarihi</label>
+                            <input type="date" id="war-date" required>
+                        </div>
+                        <div class="form-form-actions" style="display: flex; gap: 10px;">
+                            <button type="button" id="cancel-warranty-btn" class="btn-secondary" style="height: 45px;">İptal</button>
+                            <button type="submit" class="btn-primary" style="background-color: #0f766e; height: 45px;">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="warranties-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; overflow-y: auto; flex: 1; padding-bottom: 20px;">
+                    </div>
+            </div>
+
+            <div id="sankey-modal" class="modal-overlay">
+                <div class="modal-content" style="width: 800px; max-width: 95%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin:0; color: var(--primary-color);"><i class="fa-solid fa-water"></i> Para Akışı Şelalesi</h3>
+                        <i class="fa-solid fa-xmark" id="close-sankey-btn" style="font-size: 1.5rem; cursor: pointer; color: var(--text-muted);"></i>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; text-align: left;">Bu ayki paranın nerelerden gelip, hangi kategorilere aktığını gösteren akış şemasıdır.</p>
+                    <div id="sankey_basic" style="width: 100%; height: 400px; background: white; border-radius: 12px; border: 1px solid var(--glass-border);"></div>
+                </div>
+            </div>
             <div id="settings-view" style="display: none; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
                 <header class="header-section" style="margin-bottom: 0px;">
                     <div>
@@ -480,6 +529,7 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

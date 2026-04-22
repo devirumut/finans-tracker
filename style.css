@@ -2083,3 +2083,45 @@ body.dark-mode .calendar-day {
     .cal-summary-item { padding: 8px; }
     .cal-summary-item span { font-size: 0.9rem; }
 }
+
+/* ========================================= */
+/* 🛡️ GARANTİ KASASI TASARIMI 🛡️ */
+/* ========================================= */
+.warranty-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: var(--soft-shadow);
+    border-left: 5px solid #0f766e;
+}
+
+.warranty-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.warranty-card.expired {
+    border-left-color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.warranty-card.warning {
+    border-left-color: #f59e0b;
+}
+
+.warranty-header { display: flex; justify-content: space-between; align-items: flex-start; padding-right: 20px; }
+.warranty-header h4 { margin: 0; font-size: 1.1rem; color: var(--text-main); }
+.warranty-date { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+.warranty-status { font-size: 0.8rem; padding: 4px 8px; border-radius: 6px; font-weight: bold; width: fit-content; }
+.status-ok { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+.status-warn { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+.status-bad { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+.delete-war-btn { position: absolute; top: 15px; right: 15px; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
+.delete-war-btn:hover { color: var(--danger-color); }

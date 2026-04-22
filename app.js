@@ -43,7 +43,8 @@ const menuCalendar = document.getElementById('menu-calendar'); // YENİ
 const menuYearly = document.getElementById('menu-yearly');
 const menuNotes = document.getElementById('menu-notes');
 const menuSettings = document.getElementById('menu-settings');
-
+const menuWarranties = document.getElementById('menu-warranties'); // YENİ
+const warrantiesView = document.getElementById('warranties-view'); // YENİ
 const dashboardView = document.getElementById('dashboard-view');
 const calendarView = document.getElementById('calendar-view'); // YENİ
 const yearlyView = document.getElementById('yearly-view');
@@ -60,10 +61,10 @@ const catListEl = document.getElementById('category-list');
 // ==========================================
 // 3. VERİ DEPOLARI VE VARSAYILANLAR
 // ==========================================
-let expenseChartInstance = null; 
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || [];
 let notes = JSON.parse(localStorage.getItem('notes')) || [];
+let warranties = JSON.parse(localStorage.getItem('warranties')) || []; // YENİ EKLENEN SATIR
 
 const defaultCategories = [
     { id: 1, name: "Maaş 💰", type: "income", keywords: ["maaş", "avans", "prim", "harçlık", "burs", "ikramiye"] },
@@ -139,30 +140,11 @@ function showNotify(message, icon = 'fa-circle-check') {
 }
 
 // ==========================================
-// 6. MENÜ VE SEKME (TAB) SİSTEMİ + MOBİL HAMBURGER
+// 6. MENÜ VE SEKME (TAB) SİSTEMİ (TAMİR EDİLDİ)
 // ==========================================
-
-// Hamburger Menü Tanımları
-const hamburgerBtn = document.getElementById('hamburger-btn');
-const sidebar = document.querySelector('.sidebar');
-const mobileOverlay = document.getElementById('mobile-overlay');
-
-// Menü Açma Kapatma Olayları
-if (hamburgerBtn && sidebar && mobileOverlay) {
-    hamburgerBtn.addEventListener('click', () => {
-        sidebar.classList.add('mobile-open');
-        mobileOverlay.classList.add('active');
-    });
-
-    mobileOverlay.addEventListener('click', () => {
-        sidebar.classList.remove('mobile-open');
-        mobileOverlay.classList.remove('active');
-    });
-}
-
 function switchMenu(activeMenuBtn, activeViewDiv) {
-    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); });
-    [dashboardView, calendarView, yearlyView, notesView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
+    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuWarranties, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); }); 
+    [dashboardView, calendarView, yearlyView, notesView, warrantiesView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
     
     if(activeMenuBtn) activeMenuBtn.classList.add('active');
     if(activeViewDiv) activeViewDiv.style.display = 'flex';
@@ -175,28 +157,14 @@ function switchMenu(activeMenuBtn, activeViewDiv) {
     }
 }
 
+// Menü Tıklama Olayları
 if(menuDashboard) menuDashboard.onclick = (e) => { e.preventDefault(); switchMenu(menuDashboard, dashboardView); };
-if(menuCalendar) menuCalendar.onclick = (e) => { e.preventDefault(); switchMenu(menuCalendar, calendarView); renderCalendar(); }; // YENİ
+if(menuCalendar) menuCalendar.onclick = (e) => { e.preventDefault(); switchMenu(menuCalendar, calendarView); renderCalendar(); };
 if(menuYearly) menuYearly.onclick = (e) => { e.preventDefault(); switchMenu(menuYearly, yearlyView); initYearlyStatus(); };
 if(menuNotes) menuNotes.onclick = (e) => { e.preventDefault(); switchMenu(menuNotes, notesView); initNotes(); };
+if(menuWarranties) menuWarranties.onclick = (e) => { e.preventDefault(); switchMenu(menuWarranties, warrantiesView); initWarranties(); };
 if(menuSettings) menuSettings.onclick = (e) => { e.preventDefault(); switchMenu(menuSettings, settingsView); };
 
-if(menuDashboard) menuDashboard.onclick = (e) => { e.preventDefault(); switchMenu(menuDashboard, dashboardView); };
-if(menuYearly) menuYearly.onclick = (e) => { e.preventDefault(); switchMenu(menuYearly, yearlyView); initYearlyStatus(); };
-if(menuNotes) menuNotes.onclick = (e) => { e.preventDefault(); switchMenu(menuNotes, notesView); initNotes(); };
-if(menuSettings) menuSettings.onclick = (e) => { e.preventDefault(); switchMenu(menuSettings, settingsView); };
-
-const settingsTabs = document.querySelectorAll('.settings-tab-btn');
-const settingsContents = document.querySelectorAll('.settings-tab-content');
-settingsTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        settingsTabs.forEach(t => t.classList.remove('active'));
-        settingsContents.forEach(c => { c.classList.remove('active'); c.style.display = 'none'; });
-        tab.classList.add('active');
-        const targetContent = document.getElementById(tab.getAttribute('data-tab'));
-        if(targetContent) { targetContent.classList.add('active'); targetContent.style.display = 'flex'; }
-    });
-});
 // ==========================================
 // 7. GOOGLE DRİVE VE GİRİŞ SİSTEMİ
 // ==========================================
@@ -636,7 +604,6 @@ if(subForm) {
         const day = document.getElementById('sub-day').value;
 
         if (editingSubscriptionId) {
-            // GÜNCELLEME MODU
             const idx = subscriptions.findIndex(s => s.id === editingSubscriptionId);
             if(idx > -1) {
                 subscriptions[idx].category = cat;
@@ -650,11 +617,9 @@ if(subForm) {
             btn.style.backgroundColor = "var(--primary-color)";
             showNotify("Abonelik güncellendi", "fa-pen");
         } else {
-            // YENİ EKLEME MODU
             subscriptions.push({ id: Date.now(), category: cat, name: name, number: num, day: parseInt(day) });
             showNotify("Abonelik eklendi", "fa-check");
         }
-        
         localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
         initSubscriptions();
         subForm.reset();
@@ -692,7 +657,21 @@ function checkUpcomingPayments() {
                 </div>`;
         }
     });
-
+// GARANTİ BİTİŞ UYARILARI
+if(typeof warranties !== 'undefined') {
+    warranties.forEach(war => {
+        let expDate = new Date(war.date);
+        let diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0 && diffDays <= 30) {
+            hasReminders = true;
+            remindersHTML += `
+                <div class="reminder-alert" style="border-left-color: #0f766e; background: rgba(15, 118, 110, 0.1);">
+                    <i class="fa-solid fa-shield-halved" style="color: #0f766e;"></i>
+                    <span><strong>${war.name}</strong> garantisi <strong>${diffDays} gün</strong> sonra bitiyor!</span>
+                </div>`;
+        }
+    });
+}
     if(hasReminders) {
         container.style.display = 'flex';
         container.innerHTML = remindersHTML;
@@ -959,6 +938,7 @@ initCategories();
 init();
 initSubscriptions();
 initNotes();
+initWarranties();
 renderCalendar();
 
 // ==========================================
@@ -1198,3 +1178,135 @@ if (downloadPdfBtn) {
         });
     });
 }
+
+// ==========================================
+// 21. GARANTİ BELGESİ KASASI
+// ==========================================
+const addWarBtn = document.getElementById('add-warranty-btn');
+const warFormContainer = document.getElementById('warranty-form-container');
+const warForm = document.getElementById('warranty-form');
+const cancelWarBtn = document.getElementById('cancel-warranty-btn');
+const warGrid = document.getElementById('warranties-grid');
+
+if(addWarBtn) addWarBtn.onclick = () => { warFormContainer.style.display = 'block'; document.getElementById('war-name').focus(); };
+if(cancelWarBtn) cancelWarBtn.onclick = () => { warFormContainer.style.display = 'none'; warForm.reset(); };
+
+if(warForm) {
+    warForm.onsubmit = (e) => {
+        e.preventDefault();
+        const name = document.getElementById('war-name').value.trim();
+        const date = document.getElementById('war-date').value;
+        
+        warranties.push({ id: Date.now(), name: name, date: date });
+        localStorage.setItem('warranties', JSON.stringify(warranties));
+        initWarranties(); checkUpcomingPayments(); cancelWarBtn.onclick(); showNotify("Garanti belgesi kaydedildi!", "fa-shield");
+        if(accessToken) backupToDrive(true);
+    };
+}
+
+function initWarranties() {
+    if(!warGrid) return;
+    warGrid.innerHTML = '';
+    
+    if(warranties.length === 0) {
+        warGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted);"><i class="fa-solid fa-file-shield fa-3x" style="margin-bottom: 10px;"></i><p>Henüz bir garanti kaydı eklenmedi.</p></div>';
+        return;
+    }
+
+    warranties.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(war => {
+        const expDate = new Date(war.date);
+        const today = new Date();
+        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        
+        let statusClass = "status-ok"; let statusText = "Garantisi Devam Ediyor"; let cardClass = "";
+        
+        if (diffDays < 0) { statusClass = "status-bad"; statusText = "Garanti Süresi Bitti"; cardClass = "expired"; } 
+        else if (diffDays <= 30) { statusClass = "status-warn"; statusText = `Son ${diffDays} Gün!`; cardClass = "warning"; }
+
+        const div = document.createElement('div');
+        div.className = `warranty-card ${cardClass}`;
+        div.innerHTML = `
+            <i class="fa-solid fa-trash-can delete-war-btn" onclick="deleteWarranty(${war.id})"></i>
+            <div class="warranty-header"><h4><i class="fa-solid fa-box-open"></i> ${war.name}</h4></div>
+            <div class="warranty-date"><i class="fa-regular fa-calendar-xmark"></i> Bitiş: ${expDate.toLocaleDateString('tr-TR')}</div>
+            <div class="warranty-status ${statusClass}">${statusText}</div>
+        `;
+        warGrid.appendChild(div);
+    });
+}
+
+window.deleteWarranty = (id) => {
+    if(confirm("Bu garanti kaydını silmek istiyor musunuz?")) {
+        warranties = warranties.filter(w => w.id !== id);
+        localStorage.setItem('warranties', JSON.stringify(warranties));
+        initWarranties(); checkUpcomingPayments(); showNotify("Kayıt silindi", "fa-trash");
+        if(accessToken) backupToDrive(true);
+    }
+};
+
+// ==========================================
+// 22. PARA AKIŞI ŞELALESİ (SANKEY GRAFİĞİ)
+// ==========================================
+// Google Charts kütüphanesini yükle
+google.charts.load('current', {'packages':['sankey']});
+
+const openSankeyBtn = document.getElementById('open-sankey-btn');
+const closeSankeyBtn = document.getElementById('close-sankey-btn');
+const sankeyModal = document.getElementById('sankey-modal');
+
+if(openSankeyBtn && sankeyModal && closeSankeyBtn) {
+    openSankeyBtn.onclick = () => { 
+        sankeyModal.style.display = 'flex'; 
+        google.charts.setOnLoadCallback(drawSankeyChart); 
+    };
+    closeSankeyBtn.onclick = () => { sankeyModal.style.display = 'none'; };
+}
+
+function drawSankeyChart() {
+    // Sadece bulunduğumuz ayın verilerini filtrele
+    const selectedMonth = monthFilterEl ? monthFilterEl.value : new Date().toISOString().substring(0, 7);
+    const monthData = transactions.filter(t => t.date.startsWith(selectedMonth));
+    
+    let totalInc = 0;
+    const expCats = {};
+    
+    monthData.forEach(t => {
+        if (t.amount > 0) totalInc += t.amount;
+        else expCats[t.category] = (expCats[t.category] || 0) + Math.abs(t.amount);
+    });
+
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', 'Nereden');
+    data.addColumn('string', 'Nereye');
+    data.addColumn('number', 'Tutar');
+
+    let rows = [];
+    
+    // Eğer gelir yoksa şelale akamaz (suni gelir yaratıyoruz ki grafiği çizebilelim)
+    if (totalInc === 0) totalInc = 1; 
+
+    let totalExp = 0;
+    for (let cat in expCats) {
+        rows.push(['Bütçe Havuzu', cat, expCats[cat]]);
+        totalExp += expCats[cat];
+    }
+    
+    // Gelir, Bütçe havuzuna akar
+    rows.push(['Gelirler (Maaş/Ek)', 'Bütçe Havuzu', totalInc]);
+    
+    // Artan para varsa "Birikim/Kalan" koluna akar
+    if (totalInc > totalExp) {
+        rows.push(['Bütçe Havuzu', 'Kalan / Birikim', totalInc - totalExp]);
+    }
+
+    data.addRows(rows);
+
+    const options = {
+        sankey: {
+            node: { colors: ['#4a6cf7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'], width: 15, padding: 20 },
+            link: { colorMode: 'gradient' } // Renkler arası muazzam su akışı efekti
+        }
+    };
+
+    const chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+    chart.draw(data, options); }
