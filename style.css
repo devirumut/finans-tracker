@@ -1790,6 +1790,37 @@ body.dark-mode .btn-text:hover { background: rgba(255,255,255,0.1); }
     margin-bottom: 0 !important;
 }
 
+/* --- 🖥️ PC İÇİN ASİSTAN KARTI BOYUTLANDIRMA --- */
+#ai-insights-card {
+    max-width: 300px; /* PC'de çok yayılmaması için ideal, kompakt genişlik */
+    width: 100%;
+    margin-right: auto; /* Sola yaslı durması için (Ortalamak istersen 'margin: 0 auto' yapabilirsin) */
+}
+
+/* 📱 MOBİL YAMASI (GÜNCELLEME) */
+@media (max-width: 850px) {
+    /* Asistan mobilde yine tam ekran olsun */
+    #ai-insights-card {
+        max-width: 100% !important;
+    }
+
+    /* 2. ALTIN / DÖVİZ KISMINI ESKİSİ GİBİ YAPIYORUZ (REVERT) */
+    .header-section > div:nth-child(2) {
+        display: flex !important;
+        flex-wrap: wrap !important; /* Tekrar alt alta geçebilsinler */
+        overflow-x: visible !important; /* Kaydırmayı iptal et */
+        gap: 15px !important;
+        width: 100% !important;
+    }
+
+    .gold-mask-wrapper {
+        flex: 1 1 150px !important; /* Mobilde kartlar daha dengeli dizilir */
+        transform: none !important; /* Küçültmeyi kaldırdık */
+        margin-right: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
 @media (max-width: 850px) {
     /* 1. KESİN SCROLL İZNİ */
     body, html { height: auto !important; overflow-x: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
@@ -1869,4 +1900,73 @@ body.dark-mode .btn-text:hover { background: rgba(255,255,255,0.1); }
     #tab-general > div > div:nth-child(2) { grid-template-columns: 1fr !important; gap: 15px !important; }
     .modal-content { width: 95% !important; padding: 20px !important; }
     #notes-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ========================================= */
+/* ⏰ AKILLI ÖDEME HATIRLATICISI TASARIMI ⏰ */
+/* ========================================= */
+.reminder-alert {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(245, 158, 11, 0.1);
+    border-left: 4px solid #f59e0b;
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+.reminder-alert i {
+    color: #f59e0b;
+    font-size: 1.3rem;
+}
+.reminder-alert strong {
+    color: #d97706;
+}
+body.dark-mode .reminder-alert {
+    background: rgba(245, 158, 11, 0.05);
+}
+/* ========================================= */
+/* 🤖 ASİSTAN VE HATIRLATICI TASARIMLARI 🤖 */
+/* ========================================= */
+.reminder-alert {
+    display: flex; align-items: center; gap: 15px;
+    background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b;
+    padding: 12px 20px; border-radius: 10px;
+    color: var(--text-main); font-weight: 500; font-size: 0.95rem;
+}
+.reminder-alert i { color: #f59e0b; font-size: 1.3rem; }
+.reminder-alert strong { color: #d97706; }
+
+#ai-insights-text ul { list-style: none; padding-left: 0; margin: 0; }
+#ai-insights-text li { 
+    position: relative; padding-left: 20px; margin-bottom: 8px; 
+}
+#ai-insights-text li::before {
+    content: "✨"; position: absolute; left: 0; top: 0; font-size: 0.85rem;
+}
+
+body.dark-mode .reminder-alert { background: rgba(245, 158, 11, 0.05); }
+body.dark-mode #ai-insights-card { background: linear-gradient(135deg, rgba(74, 108, 247, 0.1), rgba(16, 185, 129, 0.1)) !important; border-color: rgba(74, 108, 247, 0.3) !important; }
+
+/* 1. ASİSTAN KARTI: Genişlik Tam Ekran, Yükseklik İncecik (Şerit) */
+#ai-insights-card {
+    width: 100% !important;
+    max-width: none !important; /* Genişlik kısıtlamasını tamamen kaldırdık */
+    padding: 12px 20px !important; /* Yüksekliği kısaltan can alıcı nokta (İç boşlukları traşladık) */
+    height: max-content !important; /* Yüksekliği SADECE içindeki yazı kadar olur */
+    min-height: 0 !important;
+}
+
+/* Asistan Başlığını ve Yazısını Daha Kibar Yapma */
+#ai-insights-card h3 {
+    margin-bottom: 4px !important; 
+    font-size: 1rem !important; 
+}
+
+#ai-insights-text {
+    line-height: 1.4 !important; 
+    font-size: 0.9rem !important; 
 }

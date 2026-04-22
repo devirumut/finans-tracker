@@ -67,7 +67,7 @@
                 <i class="fa-solid fa-moon"></i> Gece Modu
             </button>
             
-            <div id="notification" class="notification-toast"></div>
+        
         </aside>
 
         <main class="main-content">
@@ -78,8 +78,10 @@
             </div>
 
             <div id="dashboard-view" style="display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
+                
                 <header class="header-section">
                     <div><h1 style="font-size: 1.8rem; margin-bottom: 0;">Hoş Geldiniz 👋</h1></div>
+                    
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
                         <div class="gold-mask-wrapper">
                             <span class="gold-mask-label"><i class="fa-solid fa-dollar-sign" style="color: #10b981;"></i> Dolar</span>
@@ -100,6 +102,17 @@
                     </div>
                 </header>
 
+                <div id="payment-reminders-container" style="display: none; flex-direction: column; gap: 10px;"></div>
+
+                <div id="ai-insights-card" class="card" style="background: linear-gradient(135deg, rgba(74, 108, 247, 0.05), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(74, 108, 247, 0.2);">
+                    <h3 style="color: var(--primary-color); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-robot fa-bounce"></i> Asistan Analizi
+                    </h3>
+                    <div id="ai-insights-text" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">
+                        Sizi tanımaya çalışıyorum... Harcamalarınız biriktikçe buraya raporlar sunacağım. 🤖
+                    </div>
+                </div>
+
                 <div id="budget-tracker-card" class="card" style="margin-bottom: 25px; padding: 20px 30px; display: none;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center;">
                         <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-main);"><i class="fa-solid fa-bullseye" style="color: var(--primary-color);"></i> Aylık Bütçe Durumu</h3>
@@ -111,6 +124,7 @@
                     <small id="budget-warning-text" style="display: block; margin-top: 10px; font-weight: 600; font-size: 0.85rem;"></small>
                 </div>
 
+                
                 <section class="dashboard-cards">
                     <div class="card balance-card"><h3>Toplam Bakiye</h3><h2 id="total-balance">₺0.00</h2></div>
                     <div class="card income-card"><h3><i class="fa-solid fa-arrow-trend-up"></i> Gelirler</h3><h2 id="total-income">₺0.00</h2></div>
@@ -259,10 +273,10 @@
 
                 <div id="tab-subscriptions" class="settings-tab-content active" style="display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
                     <section class="transaction-form-section" style="flex-shrink: 0; padding: 20px;">
-                        <form id="subscription-form" class="horizontal-form" style="grid-template-columns: 1fr 1.5fr 1.5fr 1fr; align-items: end;">
+                        <form id="subscription-form" class="horizontal-form" style="grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1.5fr; align-items: end;">
                             <div class="form-group" style="margin-bottom:0;">
                                 <select id="sub-category" class="form-control" required>
-                                    <option value="" disabled selected>Fatura Türü Seç</option>
+                                    <option value="" disabled selected>Fatura Türü</option>
                                     <option value="Elektrik">Elektrik ⚡</option>
                                     <option value="Su">Su 💧</option>
                                     <option value="Doğalgaz">Doğalgaz 🔥</option>
@@ -276,6 +290,9 @@
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
                                 <input type="text" id="sub-number" placeholder="Abone Numarası" required>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <input type="number" id="sub-day" placeholder="Ödeme Günü (1-31)" min="1" max="31" required>
                             </div>
                             <button type="submit" class="btn-primary" style="height: 100%;">Abonelik Ekle</button>
                         </form>
@@ -416,5 +433,6 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
+    <div id="notification" class="notification-toast"></div>
 </body>
 </html>
