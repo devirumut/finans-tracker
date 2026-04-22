@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finans-tracker-v4';
+const CACHE_NAME = 'finans-tracker-v11';
 const urlsToCache = [
     './',
     './index.html',
@@ -6,25 +6,34 @@ const urlsToCache = [
     './app.js'
 ];
 
-// Yükleme aşamasında dosyaları önbelleğe al
+// 1. Kurulum Aşaması
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                return cache.addAll(urlsToCache);
-            })
+        caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
     );
+    self.skipWaiting(); // Yeni versiyonu beklemeden hemen devreye al
 });
 
-// İnternet olmasa bile önbellekten dosyaları getir (Offline destek)
+// 2. Aktifleşme ve Temizlik (ESKİ İNATÇI HAFIZALARI SİLER)
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cache => {
+                    if (cache !== CACHE_NAME) {
+                        console.log('Eski önbellek silindi:', cache);
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        })
+    );
+    self.clients.claim();
+});
+
+// 3. Ağ İstekleri (NETWORK FIRST: Önce internet, yoksa hafıza)
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) {
-                    return response; // Önbellekte varsa onu ver
-                }
-                return fetch(event.request); // Yoksa internetten çek
-            })
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });

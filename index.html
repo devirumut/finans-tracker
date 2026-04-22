@@ -44,6 +44,7 @@
 
             <nav class="menu">
                 <a href="#" id="menu-dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> Özet</a>
+                <a href="#" id="menu-calendar"><i class="fa-regular fa-calendar"></i> Takvim</a>
                 <a href="#" id="menu-yearly"><i class="fa-solid fa-calendar-days"></i> Yıllık Durum</a>
                 <a href="#" id="menu-notes"><i class="fa-solid fa-note-sticky"></i> Notlarım</a>
                 <a href="#" id="menu-settings"><i class="fa-solid fa-gear"></i> Ayarlar</a>
@@ -81,8 +82,7 @@
                 
                 <header class="header-section">
                     <div><h1 style="font-size: 1.8rem; margin-bottom: 0;">Hoş Geldiniz 👋</h1></div>
-                    
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
                         <div class="gold-mask-wrapper">
                             <span class="gold-mask-label"><i class="fa-solid fa-dollar-sign" style="color: #10b981;"></i> Dolar</span>
                             <div class="altin-pencere dolar-pencere"><iframe src="https://www.altinkaynak.com/canli-kurlar/doviz" scrolling="no"></iframe></div>
@@ -149,7 +149,13 @@
                             <label for="type-expense" class="type-btn expense-btn"><i class="fa-solid fa-arrow-trend-down"></i> Gider</label>
                         </div>
                         <div class="form-group"><input type="text" id="text" placeholder="İşlem Adı" required></div>
-                        <div class="form-group"><input type="number" id="amount" placeholder="Tutar (₺)" min="0" step="0.01" required></div>
+                        <div class="form-group" style="display: flex; gap: 10px;">
+                            <input type="number" id="amount" placeholder="Tutar (₺)" min="0" step="0.01" required style="flex: 1;">
+                            <button type="button" id="scan-receipt-btn" class="btn-secondary" style="width: auto; padding: 0 15px; border-radius: 10px;" title="Fiş Tara">
+                                <i class="fa-solid fa-camera"></i>
+                            </button>
+                            <input type="file" id="receipt-camera" accept="image/*" capture="environment" style="display: none;">
+                        </div>
                         <div class="form-group">
                             <select id="category" class="form-control" required>
                                 <option value="" disabled selected>Kategori Seç</option>
@@ -183,6 +189,42 @@
                         <h3><i class="fa-solid fa-chart-pie"></i> Gelir ve Gider Analizi</h3>
                         <div class="chart-container"><canvas id="expenseChart"></canvas></div>
                     </div>
+                </div>
+            </div>
+
+            <div id="calendar-view" style="display: none; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
+                <header class="header-section" style="margin-bottom: 10px;">
+                    <div>
+                        <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Harcama Takvimi 📅</h1>
+                        <p style="color: var(--text-muted);">Günlük finansal akışınızı takip edin.</p>
+                    </div>
+                    <div class="month-filter-container">
+                        <button id="cal-prev-month" class="list-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div id="cal-current-month-text" style="font-weight: bold; color: var(--text-main); min-width: 120px; text-align: center;">Ay Yıl</div>
+                        <button id="cal-next-month" class="list-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </header>
+            
+                <div class="calendar-summary-bar">
+                    <div class="cal-summary-item income">
+                        <small>Aylık Gelir</small>
+                        <span id="cal-total-income">₺0</span>
+                    </div>
+                    <div class="cal-summary-item expense">
+                        <small>Aylık Gider</small>
+                        <span id="cal-total-expense">₺0</span>
+                    </div>
+                    <div class="cal-summary-item balance">
+                        <small>Kalan (Net)</small>
+                        <span id="cal-total-balance">₺0</span>
+                    </div>
+                </div>
+            
+                <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 20px; overflow: hidden;">
+                    <div class="calendar-weekdays">
+                        <div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div><div>Paz</div>
+                    </div>
+                    <div id="calendar-grid" class="calendar-grid" style="flex: 1; overflow-y: auto;"></div>
                 </div>
             </div>
 
@@ -361,13 +403,19 @@
                         </div>
 
                         <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
-                            <h4 style="color: var(--success-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-file-excel"></i> Veri Dışa Aktarma</h4>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Tüm gelir ve gider geçmişinizi Excel'de açıp detaylı analiz etmek veya yedeklemek için bilgisayarınıza indirebilirsiniz.</p>
-                            <button id="export-excel-btn" class="btn-primary" style="padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; background-color: var(--success-color); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
-                                <i class="fa-solid fa-download"></i> Excel Olarak İndir (CSV)
-                            </button>
+                            <h4 style="color: var(--success-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-file-export"></i> Veri Dışa Aktarma ve Raporlama</h4>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Verilerinizi Excel olarak indirebilir veya görsel bir aylık PDF raporu oluşturabilirsiniz.</p>
+                            
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                <button id="export-excel-btn" class="btn-primary" style="padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; background-color: var(--success-color); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
+                                    <i class="fa-solid fa-file-excel"></i> Excel (CSV) İndir
+                                </button>
+                        
+                                <button id="download-pdf-btn" class="btn-primary" style="padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; background-color: #e11d48; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);">
+                                    <i class="fa-solid fa-file-pdf"></i> PDF Rapor Oluştur
+                                </button>
+                            </div>
                         </div>
-
                         <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
                             <h4 style="color: var(--danger-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Tehlikeli Alan</h4>
                             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Uygulamadaki verilerinizi sıfırlamak için aşağıdaki butona tıklayın ve neleri silmek istediğinizi seçin.</p>
@@ -433,6 +481,8 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <div id="notification" class="notification-toast"></div>
 </body>
 </html>
