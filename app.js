@@ -137,13 +137,42 @@ function showNotify(message, icon = 'fa-circle-check') {
 }
 
 // ==========================================
-// 6. MENÜ VE SEKME (TAB) SİSTEMİ
+// 6. MENÜ VE SEKME (TAB) SİSTEMİ + MOBİL HAMBURGER
 // ==========================================
+
+// Hamburger Menü Tanımları
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const sidebar = document.querySelector('.sidebar');
+const mobileOverlay = document.getElementById('mobile-overlay');
+
+// Menü Açma Kapatma Olayları
+if (hamburgerBtn && sidebar && mobileOverlay) {
+    hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.add('mobile-open');
+        mobileOverlay.classList.add('active');
+    });
+
+    mobileOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+    });
+}
+
+// Menü geçişlerinde mobil menünün kapandığından emin olan parça:
 function switchMenu(activeMenuBtn, activeViewDiv) {
     [menuDashboard, menuYearly, menuNotes, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); });
     [dashboardView, yearlyView, notesView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
+    
     if(activeMenuBtn) activeMenuBtn.classList.add('active');
     if(activeViewDiv) activeViewDiv.style.display = 'flex';
+
+    // Menü tıklandığında mobilde sidebar'ı ve karartmayı kapat
+    const sidebar = document.querySelector('.sidebar');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    if (window.innerWidth <= 850 && sidebar && mobileOverlay) {
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+    }
 }
 
 if(menuDashboard) menuDashboard.onclick = (e) => { e.preventDefault(); switchMenu(menuDashboard, dashboardView); };
@@ -162,7 +191,6 @@ settingsTabs.forEach(tab => {
         if(targetContent) { targetContent.classList.add('active'); targetContent.style.display = 'flex'; }
     });
 });
-
 // ==========================================
 // 7. GOOGLE DRİVE VE GİRİŞ SİSTEMİ
 // ==========================================

@@ -1767,143 +1767,106 @@ body.dark-mode .btn-text:hover { background: rgba(255,255,255,0.1); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ========================================= */
-/* 📱 MOBİL UYUM (RESPONSIVE) YAMASI 📱 */
-/* ========================================= */
+/* --- MOBİL HAMBURGER ELEMENTLERİ (PC'DE GİZLİ KALIR) --- */
+#mobile-header, #mobile-overlay { display: none; }
 
 /* ========================================= */
-/* 📱 MOBİL UYUM (GERÇEK APP GÖRÜNÜMÜ) 📱 */
+/* 📱 SÜPER KOMPAKT MOBİL UYUM YAMASI (EŞİT BOŞLUKLAR) 📱 */
 /* ========================================= */
+/* ========================================= */
+/* 🖥️ KUSURSUZ EŞİT BOŞLUK SİSTEMİ (PC + MOBİL) 🖥️ */
+/* ========================================= */
+
+/* Ana sayfalar ve Ayarlar sekmelerindeki tüm elemanların arasını sabit 15px yapıyoruz */
+#dashboard-view, #yearly-view, #notes-view, #settings-view,
+#tab-subscriptions, #tab-categories, #tab-general {
+    gap: 15px !important; 
+}
+
+/* HTML kodunun içinde daha önceden yazılmış tüm gereksiz devasa boşlukları (marginleri) ezip sıfırlıyoruz */
+#dashboard-view > *, #yearly-view > *, #notes-view > *, #settings-view > *,
+#tab-subscriptions > *, #tab-categories > *, #tab-general > * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
 
 @media (max-width: 850px) {
+    /* 1. KESİN SCROLL İZNİ */
+    body, html { height: auto !important; overflow-x: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
+    .app-container { display: block !important; height: auto !important; min-height: 100vh !important; overflow: visible !important; }
+    .main-content { padding: 15px 10px 40px 10px !important; height: auto !important; overflow: visible !important; display: flex !important; flex-direction: column !important; }
+
+    /* --- YENİ: SIFIRLAMA VE EŞİT BOŞLUK SİSTEMİ --- */
+    /* Sayfadaki tüm ekranların kutular arası boşluğunu sabit 15px yapıyoruz */
+    #dashboard-view, #yearly-view, #notes-view, #settings-view {
+        gap: 15px !important; 
+    }
+    /* HTML kodunun içinde yazan o eski devasa marginleri ezip sıfırlıyoruz */
+    #dashboard-view > *, #yearly-view > *, #notes-view > *, #settings-view > * {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* 2. HAMBURGER MENÜ VE ÜST BAR */
+    #mobile-header {
+        display: flex !important; align-items: center; justify-content: space-between;
+        padding: 12px 20px; position: sticky; top: 0; background: rgba(255, 255, 255, 0.85); z-index: 1000;
+        backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    body.dark-mode #mobile-header { background: rgba(30, 41, 59, 0.85); }
+    #hamburger-btn { background: rgba(74, 108, 247, 0.1); border: none; width: 42px; height: 42px; border-radius: 12px; font-size: 1.3rem; color: var(--primary-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+    #hamburger-btn:active { transform: scale(0.9); }
     
-    /* 1. EKRAN KİLİDİNİ AÇ VE ALT MENÜ İÇİN BOŞLUK BIRAK */
-    body, html {
-        height: auto !important;
-        overflow-y: auto !important; 
-    }
-    
-    .container {
-        flex-direction: column !important;
-        height: auto !important;
-        padding: 0 !important; /* Mobilde kenar boşluklarını sıfırlıyoruz */
-    }
+    .sidebar { position: fixed !important; top: 0 !important; left: -300px !important; width: 260px !important; height: 100vh !important; z-index: 9999 !important; transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important; border-radius: 0 !important; border-right: none !important; display: flex !important; box-shadow: 5px 0 20px rgba(0,0,0,0.2) !important; }
+    .sidebar.mobile-open { left: 0 !important; }
+    .sidebar-header, .user-profile-section, #logout-btn { display: flex !important; }
+    .menu { flex-direction: column !important; height: auto !important; align-items: stretch !important; padding: 0 15px !important; overflow-y: auto; }
+    .menu a { flex-direction: row !important; justify-content: flex-start !important; padding: 12px 15px !important; }
+    #mobile-overlay.active { display: block !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
 
-    .main-content {
-        padding: 15px 15px 90px 15px !important; /* Altta menü için 90px boşluk */
-        height: auto !important;
-        overflow: visible !important;
-    }
+    /* 3. ALTIN/DÖVİZ YATAY KAYDIRMA */
+    .header-section { flex-direction: column !important; align-items: flex-start !important; gap: 10px; }
+    .header-section h1 { font-size: 1.4rem !important; }
+    .header-section > div:nth-child(2) { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; width: 100%; padding-bottom: 10px; gap: 10px !important; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .header-section > div:nth-child(2)::-webkit-scrollbar { display: none; }
+    .gold-mask-wrapper { flex: 0 0 auto !important; transform: scale(0.85); transform-origin: left top; margin-right: -30px; margin-bottom: -15px;}
 
-    /* 2. SOL MENÜYÜ İPTAL ET -> EN ALTA SABİT APP MENÜSÜ YAP */
-    .sidebar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100% !important;
-        height: 70px !important;
-        background: var(--card-bg) !important;
-        border-right: none !important;
-        border-top: 1px solid var(--glass-border);
-        z-index: 9999;
-        padding: 0 !important;
-        display: flex;
-        justify-content: center;
-        border-radius: 20px 20px 0 0; /* Üst köşeleri yumuşatılmış App Bar */
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-        backdrop-filter: blur(10px);
-    }
+    /* 4. ANA KARTLAR */
+    .dashboard-cards { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+    .balance-card { grid-column: span 2 !important; padding: 15px !important; text-align: center;}
+    .balance-card h2 { font-size: 1.6rem !important; }
+    .income-card, .expense-card { padding: 12px 10px !important; text-align: center;}
+    .card h3 { font-size: 0.75rem !important; justify-content: center; margin-bottom: 5px !important; }
+    .income-card h2, .expense-card h2 { font-size: 1.1rem !important; }
 
-    /* Mobilde Logo, Çıkış Butonu ve Profil Kısımlarını Gizle (Sadece butonlar kalsın) */
-    .sidebar-header, .user-profile-section, #logout-btn {
-        display: none !important;
-    }
+    /* AYLIK HARCAMA BARI */
+    #income-expense-tracker-card { padding: 15px !important; }
 
-    /* Menü Butonlarının Tasarımı */
-    .menu {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100%;
-        justify-content: space-around !important;
-        align-items: center;
-        height: 100%;
-        margin: 0 !important;
-        padding: 0 5px !important;
-    }
+    /* 5. GİRİŞ FORMU */
+    .transaction-form-section { padding: 15px !important; }
+    .horizontal-form { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+    .type-selector { grid-column: span 2 !important; display: flex !important; gap: 10px !important; margin-bottom: 5px !important; }
+    .type-btn { padding: 10px !important; font-size: 0.85rem !important; }
+    .horizontal-form .form-group { margin: 0 !important; }
+    .horizontal-form input, .horizontal-form select { width: 100% !important; height: 45px !important; padding: 10px !important; font-size: 16px !important; }
+    .horizontal-form button[type="submit"] { grid-column: span 2 !important; height: 45px !important; font-size: 1.1rem !important; }
 
-    .menu a {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 0.7rem !important; /* Mobilde yazı fontunu küçült */
-        padding: 5px !important;
-        margin: 0 !important;
-        border-radius: 10px;
-        gap: 5px;
-        background: transparent !important;
-    }
+    /* 6. TABLO VE GRAFİK ALANI */
+    .bottom-split-area { display: flex !important; flex-direction: column !important; gap: 15px !important; }
+    .history-card { width: 100% !important; flex: none !important; max-height: 400px !important; padding: 15px !important;}
+    .chart-box { width: 100% !important; flex: none !important; padding: 15px !important; }
+    .chart-container { min-height: 180px !important; max-height: 180px !important; }
 
-    .menu a i { font-size: 1.3rem !important; transition: transform 0.2s; }
-    
-    /* Aktif menü butonunun ikonunu hafif büyüt ve renklendir */
-    .menu a.active { color: var(--primary-color) !important; }
-    .menu a.active i { transform: scale(1.2); }
+    /* FERAH KART TABLO GÖRÜNÜMÜ */
+    .transaction-item { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding: 12px !important; }
+    .transaction-info { width: 100% !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
+    .transaction-item > div:nth-child(2) { width: 100% !important; justify-content: space-between !important; padding-top: 8px !important; border-top: 1px dashed rgba(0,0,0,0.1) !important; }
+    body.dark-mode .transaction-item > div:nth-child(2) { border-top-color: rgba(255,255,255,0.1) !important; }
 
-    /* 3. İÇERİK KARTLARINI MOBİLE UYDURMA */
-    .dashboard-cards {
-        flex-direction: column !important;
-        gap: 15px !important;
-    }
-
-    /* Alt Alta Dizeceğimiz Formlar */
-    .horizontal-form {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 10px !important;
-    }
-    
-    form.horizontal-form { grid-template-columns: 1fr !important; }
-    
-    .horizontal-form button {
-        width: 100% !important;
-        height: 50px !important; /* Telefonda parmakla tıklamayı kolaylaştırır */
-    }
-
-    /* Tablo ve Grafiği Alt Alta Al */
-    .bottom-split-area {
-        flex-direction: column !important;
-        height: auto !important;
-        align-items: stretch !important;
-    }
-
-    .history-card {
-        width: 100% !important;
-        flex: none !important;
-        max-height: 500px !important;
-    }
-
-    .chart-box {
-        width: 100% !important;
-        flex: none !important;
-        margin-top: 10px;
-    }
-
-    /* Ayarlar Menüsü Sekmelerini Alt Alta Al */
+    /* 7. AYARLAR VE NOTLAR */
     .settings-tabs { flex-direction: column !important; gap: 5px; }
-    .settings-tab-btn { width: 100% !important; text-align: left; padding: 15px !important;}
-    
-    #tab-general > div > div:nth-child(2) {
-        grid-template-columns: 1fr !important;
-        gap: 20px !important;
-    }
-
-    /* Açılır Pencereleri (Modal) Ekrana Sığdır */
-    .modal-content {
-        width: 95% !important;
-        padding: 20px !important;
-    }
-    
-    /* Notlar ızgarasını teke düşür */
+    .settings-tab-btn { width: 100% !important; padding: 12px !important; text-align: left; }
+    #tab-general > div > div:nth-child(2) { grid-template-columns: 1fr !important; gap: 15px !important; }
+    .modal-content { width: 95% !important; padding: 20px !important; }
     #notes-grid { grid-template-columns: 1fr !important; }
 }
