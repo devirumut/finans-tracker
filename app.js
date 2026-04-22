@@ -993,55 +993,78 @@ if(scanBtn && cameraInput) {
         scanBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
         
         try {
-            // Tesseract işlemi başlat
             const result = await Tesseract.recognize(file, 'tur');
-            const text = result.data.text.toUpperCase(); // Tüm harfleri büyüt
+            const text = result.data.text.toUpperCase();
             console.log("📄 Fişten Okunan Ham Metin:\n", text); 
             
-            // OCR hatalarını düzeltmek için gereksiz boşlukları temizle
-            const cleanText = text.replace(/\s+/g, ' '); 
-            
-            // Daha güçlü rakam bulucu: 15,50 | 1.250,50 | 1250.00 gibi tüm varyasyonları yakalar
-            const amounts = cleanText.match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g); 
-            
-            if(amounts && amounts.length > 0) {
-                let maxAmount = 0;
-                
-                amounts.forEach(amt => {
-                    // "1.250,50" -> "1250.50" formatına çevirme garantisi
-                    let cleanAmt = amt;
-                    
-                    // Eğer hem nokta hem virgül varsa (örn: 1.250,50) noktayı sil, virgülü nokta yap
-                    if (cleanAmt.includes('.') && cleanAmt.includes(',')) {
-                        cleanAmt = cleanAmt.replace(/\./g, '').replace(',', '.');
-                    } 
-                    // Sadece virgül varsa (örn: 15,50) virgülü nokta yap
-                    else if (cleanAmt.includes(',')) {
-                        cleanAmt = cleanAmt.replace(',', '.');
+            const lines = text.split('\n');
+            let targetAmount = 0;
+
+            // Tutar formatını temizleme fonksiyonu (1.250,50 -> 1250.50)
+            const parseAmount = (amtStr) => {
+                let clean = amtStr;
+                if (clean.includes('.') && clean.includes(',')) {
+                    clean = clean.replace(/\./g, '').replace(',', '.');
+                } else if (clean.includes(',')) {
+                    clean = clean.replace(',', '.');
+                } else if (clean.includes('.')) {
+                    if (clean.indexOf('.') !== clean.length - 3) {
+                        clean = clean.replace(/\./g, ''); 
                     }
-                    // Sadece nokta varsa ve ondalık kısımsa (örn: 15.50) dokunma, binlikse (1.250) iptal et
-                    else if (cleanAmt.includes('.')) {
-                        if (cleanAmt.indexOf('.') !== cleanAmt.length - 3) {
-                            cleanAmt = cleanAmt.replace(/\./g, ''); 
-                        }
+                }
+                return parseFloat(clean);
+            };
+
+            // YÖNTEM 1: İçinde "TOPLAM" geçen ama "KDV" geçmeyen satırı bul
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                
+                // TOPKDV gibi kelimeleri eliyoruz, sadece TOPLAM'a odaklanıyoruz
+                if (line.includes('TOPLAM') && !line.includes('KDV')) {
+                    let match = line.match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g);
+                    
+                    // Rakam o satırda yoksa bir alt satıra bak (bazen alt alta kayar)
+                    if (!match && i + 1 < lines.length) {
+                        match = lines[i+1].match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g);
                     }
 
-                    let val = parseFloat(cleanAmt);
-                    
-                    // Fişteki devasa barkod sayılarını elemek için makul bir sınır (örn: maks 200.000 TL)
-                    if(!isNaN(val) && val > maxAmount && val < 200000) {
-                        maxAmount = val;
+                    if (match) {
+                        let val = parseAmount(match[match.length - 1]); // En sağdaki rakamı al
+                        if (!isNaN(val) && val > targetAmount) {
+                            targetAmount = val;
+                        }
+                    }
+                }
+            }
+
+            // YÖNTEM 2: Eğer üstteki yöntem bulamadıysa, KDV satırlarını ÇÖPE ATIP kalanlar içinde en büyük rakamı bul
+            if (targetAmount === 0) {
+                console.log("TOPLAM kelimesi net okunamadı, KDV satırları filtrelenerek aranıyor...");
+                let safeText = "";
+                lines.forEach(line => {
+                    // KDV geçen satırları tamamen atla, rakamlarını görme
+                    if (!line.includes('KDV')) { 
+                        safeText += line + " ";
                     }
                 });
                 
-                if (maxAmount > 0) {
-                    document.getElementById('amount').value = maxAmount;
-                    showNotify(`Tutar başarıyla okundu: ${maxAmount} ₺`, "fa-check-double");
-                } else {
-                    showNotify("Makul bir tutar bulunamadı, elle giriniz.", "fa-triangle-exclamation");
+                const amounts = safeText.replace(/\s+/g, ' ').match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g);
+                if (amounts) {
+                    amounts.forEach(amt => {
+                        let val = parseAmount(amt);
+                        // Fişteki uzun barkodları elemek için 200.000 TL sınırı
+                        if (!isNaN(val) && val > targetAmount && val < 200000) {
+                            targetAmount = val;
+                        }
+                    });
                 }
+            }
+
+            if (targetAmount > 0) {
+                document.getElementById('amount').value = targetAmount;
+                showNotify(`Tutar başarıyla okundu: ${targetAmount} ₺`, "fa-check-double");
             } else {
-                showNotify("Fişte rakam okunamadı, daha yakından çekin.", "fa-triangle-exclamation");
+                showNotify("Tutar net okunamadı, elle giriniz.", "fa-triangle-exclamation");
             }
         } catch (err) {
             console.error("OCR Hatası:", err);
