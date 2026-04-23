@@ -2135,3 +2135,50 @@ html, body {
         z-index: 9998 !important; /* KRİTİK KOD: Menüden (9999) BİR KATMAN AŞAĞIDA */
     }
 }
+
+/* ========================================= */
+/* 🆘 MOBİL MENÜ KESİN KURTARMA YAMASI 🆘 */
+/* ========================================= */
+
+@media (max-width: 850px) {
+    /* 1. Üst Barı ve Butonu Tıklanabilir Yap */
+    #mobile-header {
+        z-index: 9000 !important;
+        pointer-events: auto !important;
+    }
+    
+    #hamburger-btn {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        z-index: 9001 !important;
+    }
+    
+    /* 2. Menüyü Her Şeyin Üstüne Çıkar ve Başlangıçta Gizle */
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: -350px !important; /* Ekranın dışında pusuda bekler */
+        width: 280px !important;
+        height: 100dvh !important;
+        z-index: 9999 !important; /* KRİTİK: Her şeyin üstüne çıkarır */
+        transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        background-color: #1e293b !important;
+    }
+    
+    /* 3. Butona Basıldığında Ekrana Şak Diye Otursun */
+    .sidebar.mobile-open {
+        left: 0 !important;
+    }
+    
+    /* 4. Arka Plandaki Siyah Karartma (Menünün bir alt katmanı) */
+    #mobile-overlay.active {
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0,0,0,0.6) !important;
+        z-index: 9995 !important;
+    }
+}
