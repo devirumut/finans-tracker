@@ -9,6 +9,7 @@ let accessToken = null;
 let driveFileId = null;
 let editingId = null; 
 let editingCategoryId = null;
+let expenseChartInstance = null; 
 
 // ==========================================
 // 2. DOM ELEMENTLERİ
@@ -26,7 +27,6 @@ const themeBtn = document.getElementById('theme-toggle');
 const dateEl = document.getElementById('date');
 const searchEl = document.getElementById('search');
 
-// FİLTRE VE BUTONLAR
 const monthFilterEl = document.getElementById('month-filter');
 const prevMonthBtn = document.getElementById('prev-month-btn');
 const nextMonthBtn = document.getElementById('next-month-btn');
@@ -37,21 +37,18 @@ const fetchBtn = document.getElementById('fetch-btn');
 const notification = document.getElementById('notification');
 const submitBtn = document.getElementById('submit-btn');
 
-// 4'LÜ MENÜ VE EKRAN ELEMENTLERİ
 const menuDashboard = document.getElementById('menu-dashboard');
-const menuCalendar = document.getElementById('menu-calendar'); // YENİ
+const menuCalendar = document.getElementById('menu-calendar'); 
 const menuYearly = document.getElementById('menu-yearly');
 const menuNotes = document.getElementById('menu-notes');
 const menuSettings = document.getElementById('menu-settings');
-const menuWarranties = document.getElementById('menu-warranties'); // YENİ
-const warrantiesView = document.getElementById('warranties-view'); // YENİ
+
 const dashboardView = document.getElementById('dashboard-view');
-const calendarView = document.getElementById('calendar-view'); // YENİ
+const calendarView = document.getElementById('calendar-view'); 
 const yearlyView = document.getElementById('yearly-view');
 const notesView = document.getElementById('notes-view');
 const settingsView = document.getElementById('settings-view');
 
-// ABONELİK VE KATEGORİ ELEMENTLERİ
 const subForm = document.getElementById('subscription-form');
 const subListEl = document.getElementById('subscription-list');
 const tickerEl = document.getElementById('ticker-content');
@@ -64,7 +61,6 @@ const catListEl = document.getElementById('category-list');
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || [];
 let notes = JSON.parse(localStorage.getItem('notes')) || [];
-let warranties = JSON.parse(localStorage.getItem('warranties')) || []; // YENİ EKLENEN SATIR
 
 const defaultCategories = [
     { id: 1, name: "Maaş 💰", type: "income", keywords: ["maaş", "avans", "prim", "harçlık", "burs", "ikramiye"] },
@@ -135,35 +131,54 @@ function setDefaultDate() {
 let notifyTimeout;
 function showNotify(message, icon = 'fa-circle-check') {
     if (!notification) return;
-    notification.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`; notification.classList.add('show');
-    clearTimeout(notifyTimeout); notifyTimeout = setTimeout(() => notification.classList.remove('show'), 3000);
+    notification.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`; 
+    notification.classList.add('show');
+    clearTimeout(notifyTimeout); 
+    notifyTimeout = setTimeout(() => notification.classList.remove('show'), 3000);
 }
 
 // ==========================================
-// 6. MENÜ VE SEKME (TAB) SİSTEMİ (TAMİR EDİLDİ)
+// 6. MENÜ VE SEKME (TAB) SİSTEMİ
 // ==========================================
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const sidebar = document.querySelector('.sidebar');
+const mobileOverlay = document.getElementById('mobile-overlay');
+
+if (hamburgerBtn && sidebar && mobileOverlay) {
+    hamburgerBtn.addEventListener('click', () => { sidebar.classList.add('mobile-open'); mobileOverlay.classList.add('active'); });
+    mobileOverlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); mobileOverlay.classList.remove('active'); });
+}
+
 function switchMenu(activeMenuBtn, activeViewDiv) {
-    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuWarranties, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); }); 
-    [dashboardView, calendarView, yearlyView, notesView, warrantiesView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
+    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); });
+    [dashboardView, calendarView, yearlyView, notesView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
     
     if(activeMenuBtn) activeMenuBtn.classList.add('active');
     if(activeViewDiv) activeViewDiv.style.display = 'flex';
 
-    const sidebar = document.querySelector('.sidebar');
-    const mobileOverlay = document.getElementById('mobile-overlay');
     if (window.innerWidth <= 850 && sidebar && mobileOverlay) {
         sidebar.classList.remove('mobile-open');
         mobileOverlay.classList.remove('active');
     }
 }
 
-// Menü Tıklama Olayları
 if(menuDashboard) menuDashboard.onclick = (e) => { e.preventDefault(); switchMenu(menuDashboard, dashboardView); };
 if(menuCalendar) menuCalendar.onclick = (e) => { e.preventDefault(); switchMenu(menuCalendar, calendarView); renderCalendar(); };
 if(menuYearly) menuYearly.onclick = (e) => { e.preventDefault(); switchMenu(menuYearly, yearlyView); initYearlyStatus(); };
 if(menuNotes) menuNotes.onclick = (e) => { e.preventDefault(); switchMenu(menuNotes, notesView); initNotes(); };
-if(menuWarranties) menuWarranties.onclick = (e) => { e.preventDefault(); switchMenu(menuWarranties, warrantiesView); initWarranties(); };
 if(menuSettings) menuSettings.onclick = (e) => { e.preventDefault(); switchMenu(menuSettings, settingsView); };
+
+const settingsTabs = document.querySelectorAll('.settings-tab-btn');
+const settingsContents = document.querySelectorAll('.settings-tab-content');
+settingsTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        settingsTabs.forEach(t => t.classList.remove('active'));
+        settingsContents.forEach(c => { c.classList.remove('active'); c.style.display = 'none'; });
+        tab.classList.add('active');
+        const targetContent = document.getElementById(tab.getAttribute('data-tab'));
+        if(targetContent) { targetContent.classList.add('active'); targetContent.style.display = 'flex'; }
+    });
+});
 
 // ==========================================
 // 7. GOOGLE DRİVE VE GİRİŞ SİSTEMİ
@@ -310,9 +325,6 @@ function addTransactionDOM(t) {
     if (listEl) listEl.appendChild(item);
 }
 
-// ==========================================
-// YAPAY ZEKA VE DEĞER GÜNCELLEMELERİ
-// ==========================================
 function updateValues(currentTransactions) {
     const total = currentTransactions.reduce((acc, t) => acc + t.amount, 0).toFixed(2);
     const inc = currentTransactions.filter(t => t.amount > 0).reduce((acc, t) => acc + t.amount, 0).toFixed(2);
@@ -323,17 +335,15 @@ function updateValues(currentTransactions) {
     if(expenseEl) expenseEl.innerText = `${currentCurrency}${exp}`;
     
     updateIncomeExpenseUI(parseFloat(inc), parseFloat(exp));
-    generateAIInsights(currentTransactions, parseFloat(inc), parseFloat(exp)); // YZ MOTORUNU ÇALIŞTIR
+    generateAIInsights(currentTransactions, parseFloat(inc), parseFloat(exp));
 }
 
-// 🤖 MİNİ YAPAY ZEKA MOTORU
 function generateAIInsights(transactions, totalInc, totalExp) {
     const aiContainer = document.getElementById('ai-insights-text');
     if(!aiContainer) return;
 
     let insights = [];
 
-    // 1. Bütçe ve Tasarruf Analizi
     if(totalInc > 0) {
         const saveRate = (((totalInc - totalExp) / totalInc) * 100).toFixed(1);
         if(saveRate > 20) insights.push(`Harika gidiyorsunuz! Bu ay gelirinizin <strong>%${saveRate}</strong> kadarını tasarruf ettiniz. Hedeflerinize hızla ulaşıyorsunuz. 🎯`);
@@ -343,7 +353,6 @@ function generateAIInsights(transactions, totalInc, totalExp) {
         insights.push(`Bu ay henüz bir gelir girmediniz ama harcama yapıyorsunuz. Bakiyeniz eriyor! 📉`);
     }
 
-    // 2. En Yüksek Harcama Kalemi Analizi
     const expCats = {};
     transactions.filter(t => t.amount < 0).forEach(t => { expCats[t.category] = (expCats[t.category] || 0) + Math.abs(t.amount); });
 
@@ -397,9 +406,6 @@ if(searchEl) {
     });
 }
 
-// ==========================================
-// 9. DİNAMİK GELİR / GİDER ÇUBUĞU (AI)
-// ==========================================
 function updateIncomeExpenseUI(totalIncome, totalExpense) {
     const trackerCard = document.getElementById('income-expense-tracker-card');
     const progressFill = document.getElementById('tracker-progress-fill');
@@ -520,7 +526,7 @@ if(catForm) {
 // ==========================================
 // 11. ABONELİK SİSTEMİ VE AKILLI HATIRLATICI
 // ==========================================
-let editingSubscriptionId = null; // Düzenlenen aboneliği takip etmek için
+let editingSubscriptionId = null;
 
 const subIconMap = { 
     'Elektrik': '<i class="fa-solid fa-bolt" style="color: #eab308;"></i>', 
@@ -542,7 +548,6 @@ function renderTicker() {
     tickerEl.innerHTML = html;
 }
 
-// ABONELİK DÜZENLEME FONKSİYONU
 window.editSubscription = function(id) {
     const sub = subscriptions.find(s => s.id === id);
     if(!sub) return;
@@ -558,8 +563,6 @@ window.editSubscription = function(id) {
         submitBtn.innerText = "Güncelle";
         submitBtn.style.backgroundColor = "var(--success-color)";
     }
-    
-    // Ayarlar sekmesinde formu görebilmesi için yukarı kaydır
     document.getElementById('tab-subscriptions').scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -627,7 +630,6 @@ if(subForm) {
     };
 }
 
-// 🤖 YENİ: AKILLI YAKLAŞAN ÖDEME MOTORU (GÖRÜNÜRLÜK FIX)
 function checkUpcomingPayments() {
     const container = document.getElementById('payment-reminders-container');
     if(!container) return;
@@ -646,7 +648,6 @@ function checkUpcomingPayments() {
         let targetDay = sub.day > daysInMonth ? daysInMonth : sub.day;
         let diff = targetDay - currentDay;
 
-        // Ödemeye 3 gün kala veya bugünse göster
         if (diff >= 0 && diff <= 3) {
             hasReminders = true;
             let timeText = diff === 0 ? "Bugün!" : `${diff} gün sonra`;
@@ -657,21 +658,7 @@ function checkUpcomingPayments() {
                 </div>`;
         }
     });
-// GARANTİ BİTİŞ UYARILARI
-if(typeof warranties !== 'undefined') {
-    warranties.forEach(war => {
-        let expDate = new Date(war.date);
-        let diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-        if (diffDays >= 0 && diffDays <= 30) {
-            hasReminders = true;
-            remindersHTML += `
-                <div class="reminder-alert" style="border-left-color: #0f766e; background: rgba(15, 118, 110, 0.1);">
-                    <i class="fa-solid fa-shield-halved" style="color: #0f766e;"></i>
-                    <span><strong>${war.name}</strong> garantisi <strong>${diffDays} gün</strong> sonra bitiyor!</span>
-                </div>`;
-        }
-    });
-}
+
     if(hasReminders) {
         container.style.display = 'flex';
         container.innerHTML = remindersHTML;
@@ -743,15 +730,12 @@ if (cancelResetBtn) cancelResetBtn.addEventListener('click', () => {
     document.querySelectorAll('.danger-checkbox').forEach(cb => cb.checked = false); 
 });
 
-// YENİ: "Tümünü Seç" Kutusu Mantığı
 if (resetAllCb) {
     resetAllCb.addEventListener('change', (e) => {
-        // Tümünü seç'e tıklanınca diğer tüm kutuları da aynı duruma getir
         document.querySelectorAll('.reset-item').forEach(cb => cb.checked = e.target.checked);
     });
 }
 
-// YENİ: Alt kutulardan biri kapanırsa "Tümünü Seç" kutusunun da tikini kaldır
 document.querySelectorAll('.reset-item').forEach(item => {
     item.addEventListener('change', () => {
         const allChecked = Array.from(document.querySelectorAll('.reset-item')).every(cb => cb.checked);
@@ -785,7 +769,7 @@ if (confirmResetBtn) {
 }
 
 // ==========================================
-// 15. NOTLARIM MODÜLÜ (YENİ)
+// 15. NOTLARIM MODÜLÜ
 // ==========================================
 const addNoteBtn = document.getElementById('add-note-btn');
 const noteFormContainer = document.getElementById('note-form-container');
@@ -811,7 +795,7 @@ if(saveNoteBtn) {
             date: new Date().toLocaleString('tr-TR')
         };
         
-        notes.unshift(newNote); // En başa ekle
+        notes.unshift(newNote); 
         localStorage.setItem('notes', JSON.stringify(notes));
         initNotes();
         cancelNoteBtn.onclick();
@@ -858,7 +842,6 @@ let calCurrentDate = new Date();
 function renderCalendar() {
     const grid = document.getElementById('calendar-grid');
     const monthText = document.getElementById('cal-current-month-text');
-    // Yeni elementler:
     const totalIncEl = document.getElementById('cal-total-income');
     const totalExpEl = document.getElementById('cal-total-expense');
     const totalBalEl = document.getElementById('cal-total-balance');
@@ -872,7 +855,6 @@ function renderCalendar() {
     monthText.innerText = `${monthNamesTR[month]} ${year}`;
     grid.innerHTML = '';
 
-    // --- AYIN TOPLAMLARINI HESAPLA ---
     const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
     const monthTransactions = transactions.filter(t => t.date.startsWith(prefix));
     
@@ -880,19 +862,14 @@ function renderCalendar() {
     const monthExp = Math.abs(monthTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
     const monthNet = monthInc - monthExp;
 
-    // Arayüzü Güncelle
     if(totalIncEl) totalIncEl.innerText = `${currentCurrency}${monthInc.toLocaleString('tr-TR', {minimumFractionDigits: 0})}`;
     if(totalExpEl) totalExpEl.innerText = `${currentCurrency}${monthExp.toLocaleString('tr-TR', {minimumFractionDigits: 0})}`;
     if(totalBalEl) {
-        // Eksiyse eksi işaretini para biriminin önüne alıyoruz (-₺150 gibi)
         const sign = monthNet < 0 ? '-' : '';
         totalBalEl.innerText = `${sign}${currentCurrency}${Math.abs(monthNet).toLocaleString('tr-TR', {minimumFractionDigits: 0})}`;
-        
-        // CSS Sınıflarını ezip direkt olarak renk atıyoruz (Kesin Çözüm)
         totalBalEl.style.color = monthNet >= 0 ? '#10b981' : '#ef4444'; 
     }
 
-    // --- TAKVİM ÇİZİMİ (ESKİ KODUN DEVAMI) ---
     let firstDay = new Date(year, month, 1).getDay();
     firstDay = firstDay === 0 ? 7 : firstDay; 
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -938,7 +915,6 @@ initCategories();
 init();
 initSubscriptions();
 initNotes();
-initWarranties();
 renderCalendar();
 
 // ==========================================
@@ -948,7 +924,7 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
             .then(registration => {
-                console.log('ServiceWorker başarıyla kaydedildi! Kapsam: ', registration.scope);
+                console.log('ServiceWorker başarıyla kaydedildi!');
             })
             .catch(err => {
                 console.log('ServiceWorker kaydı başarısız oldu: ', err);
@@ -980,7 +956,6 @@ if(scanBtn && cameraInput) {
             const lines = text.split('\n');
             let targetAmount = 0;
 
-            // Tutar formatını temizleme fonksiyonu (1.250,50 -> 1250.50)
             const parseAmount = (amtStr) => {
                 let clean = amtStr;
                 if (clean.includes('.') && clean.includes(',')) {
@@ -995,21 +970,18 @@ if(scanBtn && cameraInput) {
                 return parseFloat(clean);
             };
 
-            // YÖNTEM 1: İçinde "TOPLAM" geçen ama "KDV" geçmeyen satırı bul
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
                 
-                // TOPKDV gibi kelimeleri eliyoruz, sadece TOPLAM'a odaklanıyoruz
                 if (line.includes('TOPLAM') && !line.includes('KDV')) {
                     let match = line.match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g);
                     
-                    // Rakam o satırda yoksa bir alt satıra bak (bazen alt alta kayar)
                     if (!match && i + 1 < lines.length) {
                         match = lines[i+1].match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/g);
                     }
 
                     if (match) {
-                        let val = parseAmount(match[match.length - 1]); // En sağdaki rakamı al
+                        let val = parseAmount(match[match.length - 1]); 
                         if (!isNaN(val) && val > targetAmount) {
                             targetAmount = val;
                         }
@@ -1017,12 +989,10 @@ if(scanBtn && cameraInput) {
                 }
             }
 
-            // YÖNTEM 2: Eğer üstteki yöntem bulamadıysa, KDV satırlarını ÇÖPE ATIP kalanlar içinde en büyük rakamı bul
             if (targetAmount === 0) {
                 console.log("TOPLAM kelimesi net okunamadı, KDV satırları filtrelenerek aranıyor...");
                 let safeText = "";
                 lines.forEach(line => {
-                    // KDV geçen satırları tamamen atla, rakamlarını görme
                     if (!line.includes('KDV')) { 
                         safeText += line + " ";
                     }
@@ -1032,7 +1002,6 @@ if(scanBtn && cameraInput) {
                 if (amounts) {
                     amounts.forEach(amt => {
                         let val = parseAmount(amt);
-                        // Fişteki uzun barkodları elemek için 200.000 TL sınırı
                         if (!isNaN(val) && val > targetAmount && val < 200000) {
                             targetAmount = val;
                         }
@@ -1055,8 +1024,9 @@ if(scanBtn && cameraInput) {
         cameraInput.value = '';
     };
 }
+
 // ==========================================
-// 20. PROFESYONEL PDF RAPOR ÇIKTISI (ÖZEL TASARIM)
+// 20. PROFESYONEL PDF RAPOR ÇIKTISI
 // ==========================================
 const downloadPdfBtn = document.getElementById('download-pdf-btn');
 
@@ -1074,14 +1044,12 @@ if (downloadPdfBtn) {
         const month = today.getMonth();
         const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
         
-        // --- 1. AYLIK VERİLERİ HESAPLA ---
         const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
         const monthData = transactions.filter(t => t.date.startsWith(prefix));
         const monthInc = monthData.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
         const monthExp = Math.abs(monthData.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
         const percent = monthInc > 0 ? Math.min((monthExp / monthInc) * 100, 100) : (monthExp > 0 ? 100 : 0);
 
-        // --- 2. YILLIK TABLO VERİLERİNİ HAZIRLA (Daha Kibar Padding) ---
         let yearlyRowsHtml = '';
         let yearlyTotalInc = 0, yearlyTotalExp = 0;
 
@@ -1102,7 +1070,6 @@ if (downloadPdfBtn) {
                 </tr>`;
         });
 
-        // --- 3. ÖZEL RAPOR ŞABLONU (KOMPAKT VE KİBAR TASARIM) ---
         const reportTemplate = `
             <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 25px; color: #1e293b; background: white; font-size: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4a6cf7; padding-bottom: 15px; margin-bottom: 20px;">
@@ -1164,9 +1131,8 @@ if (downloadPdfBtn) {
             </div>
         `;
 
-        // --- 4. PDF OLUŞTUR VE İNDİR (Daha Dar Kenar Boşlukları) ---
         const opt = {
-            margin:       10, // 15'ten 10'a düşürüldü, sayfa daha verimli kullanılıyor
+            margin:       10, 
             filename:     `Finans_Ozet_Raporu_${year}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, backgroundColor: '#ffffff' },
@@ -1178,135 +1144,3 @@ if (downloadPdfBtn) {
         });
     });
 }
-
-// ==========================================
-// 21. GARANTİ BELGESİ KASASI
-// ==========================================
-const addWarBtn = document.getElementById('add-warranty-btn');
-const warFormContainer = document.getElementById('warranty-form-container');
-const warForm = document.getElementById('warranty-form');
-const cancelWarBtn = document.getElementById('cancel-warranty-btn');
-const warGrid = document.getElementById('warranties-grid');
-
-if(addWarBtn) addWarBtn.onclick = () => { warFormContainer.style.display = 'block'; document.getElementById('war-name').focus(); };
-if(cancelWarBtn) cancelWarBtn.onclick = () => { warFormContainer.style.display = 'none'; warForm.reset(); };
-
-if(warForm) {
-    warForm.onsubmit = (e) => {
-        e.preventDefault();
-        const name = document.getElementById('war-name').value.trim();
-        const date = document.getElementById('war-date').value;
-        
-        warranties.push({ id: Date.now(), name: name, date: date });
-        localStorage.setItem('warranties', JSON.stringify(warranties));
-        initWarranties(); checkUpcomingPayments(); cancelWarBtn.onclick(); showNotify("Garanti belgesi kaydedildi!", "fa-shield");
-        if(accessToken) backupToDrive(true);
-    };
-}
-
-function initWarranties() {
-    if(!warGrid) return;
-    warGrid.innerHTML = '';
-    
-    if(warranties.length === 0) {
-        warGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted);"><i class="fa-solid fa-file-shield fa-3x" style="margin-bottom: 10px;"></i><p>Henüz bir garanti kaydı eklenmedi.</p></div>';
-        return;
-    }
-
-    warranties.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(war => {
-        const expDate = new Date(war.date);
-        const today = new Date();
-        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
-        
-        let statusClass = "status-ok"; let statusText = "Garantisi Devam Ediyor"; let cardClass = "";
-        
-        if (diffDays < 0) { statusClass = "status-bad"; statusText = "Garanti Süresi Bitti"; cardClass = "expired"; } 
-        else if (diffDays <= 30) { statusClass = "status-warn"; statusText = `Son ${diffDays} Gün!`; cardClass = "warning"; }
-
-        const div = document.createElement('div');
-        div.className = `warranty-card ${cardClass}`;
-        div.innerHTML = `
-            <i class="fa-solid fa-trash-can delete-war-btn" onclick="deleteWarranty(${war.id})"></i>
-            <div class="warranty-header"><h4><i class="fa-solid fa-box-open"></i> ${war.name}</h4></div>
-            <div class="warranty-date"><i class="fa-regular fa-calendar-xmark"></i> Bitiş: ${expDate.toLocaleDateString('tr-TR')}</div>
-            <div class="warranty-status ${statusClass}">${statusText}</div>
-        `;
-        warGrid.appendChild(div);
-    });
-}
-
-window.deleteWarranty = (id) => {
-    if(confirm("Bu garanti kaydını silmek istiyor musunuz?")) {
-        warranties = warranties.filter(w => w.id !== id);
-        localStorage.setItem('warranties', JSON.stringify(warranties));
-        initWarranties(); checkUpcomingPayments(); showNotify("Kayıt silindi", "fa-trash");
-        if(accessToken) backupToDrive(true);
-    }
-};
-
-// ==========================================
-// 22. PARA AKIŞI ŞELALESİ (SANKEY GRAFİĞİ)
-// ==========================================
-// Google Charts kütüphanesini yükle
-google.charts.load('current', {'packages':['sankey']});
-
-const openSankeyBtn = document.getElementById('open-sankey-btn');
-const closeSankeyBtn = document.getElementById('close-sankey-btn');
-const sankeyModal = document.getElementById('sankey-modal');
-
-if(openSankeyBtn && sankeyModal && closeSankeyBtn) {
-    openSankeyBtn.onclick = () => { 
-        sankeyModal.style.display = 'flex'; 
-        google.charts.setOnLoadCallback(drawSankeyChart); 
-    };
-    closeSankeyBtn.onclick = () => { sankeyModal.style.display = 'none'; };
-}
-
-function drawSankeyChart() {
-    // Sadece bulunduğumuz ayın verilerini filtrele
-    const selectedMonth = monthFilterEl ? monthFilterEl.value : new Date().toISOString().substring(0, 7);
-    const monthData = transactions.filter(t => t.date.startsWith(selectedMonth));
-    
-    let totalInc = 0;
-    const expCats = {};
-    
-    monthData.forEach(t => {
-        if (t.amount > 0) totalInc += t.amount;
-        else expCats[t.category] = (expCats[t.category] || 0) + Math.abs(t.amount);
-    });
-
-    const data = new google.visualization.DataTable();
-    data.addColumn('string', 'Nereden');
-    data.addColumn('string', 'Nereye');
-    data.addColumn('number', 'Tutar');
-
-    let rows = [];
-    
-    // Eğer gelir yoksa şelale akamaz (suni gelir yaratıyoruz ki grafiği çizebilelim)
-    if (totalInc === 0) totalInc = 1; 
-
-    let totalExp = 0;
-    for (let cat in expCats) {
-        rows.push(['Bütçe Havuzu', cat, expCats[cat]]);
-        totalExp += expCats[cat];
-    }
-    
-    // Gelir, Bütçe havuzuna akar
-    rows.push(['Gelirler (Maaş/Ek)', 'Bütçe Havuzu', totalInc]);
-    
-    // Artan para varsa "Birikim/Kalan" koluna akar
-    if (totalInc > totalExp) {
-        rows.push(['Bütçe Havuzu', 'Kalan / Birikim', totalInc - totalExp]);
-    }
-
-    data.addRows(rows);
-
-    const options = {
-        sankey: {
-            node: { colors: ['#4a6cf7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'], width: 15, padding: 20 },
-            link: { colorMode: 'gradient' } // Renkler arası muazzam su akışı efekti
-        }
-    };
-
-    const chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
-    chart.draw(data, options); }
