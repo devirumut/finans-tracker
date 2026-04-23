@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html lang="tr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        
-        <title>Finans Tracker - devirumut</title>
-        <link rel="manifest" href="manifest.json">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finans Tracker - devirumut</title>
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a6cf7">
     <link rel="apple-touch-icon" href="icon-192.png">
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="style.css">
-    </head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-
     <div class="app-container">
         <div id="mobile-header">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -47,43 +45,33 @@
                 <a href="#" id="menu-calendar"><i class="fa-regular fa-calendar"></i> Takvim</a>
                 <a href="#" id="menu-yearly"><i class="fa-solid fa-calendar-days"></i> Yıllık Durum</a>
                 <a href="#" id="menu-notes"><i class="fa-solid fa-note-sticky"></i> Notlarım</a>
-                <a href="#" id="menu-warranties"><i class="fa-solid fa-shield-halved"></i> Garanti Kasası</a>
                 <a href="#" id="menu-settings"><i class="fa-solid fa-gear"></i> Ayarlar</a>
                 
                 <div style="margin-top: auto; padding-top: 20px; display: flex; gap: 10px;">
-    
                     <button id="fetch-btn" class="btn-primary cloud-btn">
                         <i class="fa-solid fa-cloud-arrow-down"></i>
                         <span>Drive'dan İndir</span>
                     </button>
-                    
                     <button id="backup-btn" class="btn-primary cloud-btn">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Drive'a Yedekle</span>
                     </button>
-                
                 </div>
             </nav>
-
             <button id="theme-toggle" class="theme-btn" style="margin-top: 20px;">
                 <i class="fa-solid fa-moon"></i> Gece Modu
             </button>
-            
-        
         </aside>
 
         <main class="main-content">
-            
             <div class="ticker-wrapper">
-                <div class="ticker-content" id="ticker-content">
-                    </div>
+                <div class="ticker-content" id="ticker-content"></div>
             </div>
 
             <div id="dashboard-view" style="display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
-                
                 <header class="header-section">
                     <div><h1 style="font-size: 1.8rem; margin-bottom: 0;">Hoş Geldiniz 👋</h1></div>
-                                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
                         <div class="gold-mask-wrapper">
                             <span class="gold-mask-label"><i class="fa-solid fa-dollar-sign" style="color: #10b981;"></i> Dolar</span>
                             <div class="altin-pencere dolar-pencere"><iframe src="https://www.altinkaynak.com/canli-kurlar/doviz" scrolling="no"></iframe></div>
@@ -114,23 +102,12 @@
                     </div>
                 </div>
 
-                <div id="budget-tracker-card" class="card" style="margin-bottom: 25px; padding: 20px 30px; display: none;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center;">
-                        <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-main);"><i class="fa-solid fa-bullseye" style="color: var(--primary-color);"></i> Aylık Bütçe Durumu</h3>
-                        <span id="budget-status-text" style="font-weight: 700; font-size: 1rem; color: var(--text-main);">₺0 / ₺0</span>
-                    </div>
-                    <div class="budget-bar-bg" style="width: 100%; height: 14px; background: rgba(0,0,0,0.06); border-radius: 10px; overflow: hidden; position: relative;">
-                        <div id="budget-progress-fill" style="height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.5s ease; border-radius: 10px;"></div>
-                    </div>
-                    <small id="budget-warning-text" style="display: block; margin-top: 10px; font-weight: 600; font-size: 0.85rem;"></small>
-                </div>
-
-                
                 <section class="dashboard-cards">
                     <div class="card balance-card"><h3>Toplam Bakiye</h3><h2 id="total-balance">₺0.00</h2></div>
                     <div class="card income-card"><h3><i class="fa-solid fa-arrow-trend-up"></i> Gelirler</h3><h2 id="total-income">₺0.00</h2></div>
                     <div class="card expense-card"><h3><i class="fa-solid fa-arrow-trend-down"></i> Giderler</h3><h2 id="total-expense">₺0.00</h2></div>
                 </section>
+
                 <div id="income-expense-tracker-card" class="card" style="margin-bottom: 25px; padding: 20px 30px; display: none;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center;">
                         <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-main);"><i class="fa-solid fa-scale-balanced" style="color: var(--primary-color);"></i> Aylık Harcama Durumu</h3>
@@ -141,6 +118,7 @@
                     </div>
                     <small id="tracker-warning-text" style="display: block; margin-top: 10px; font-weight: 600; font-size: 0.85rem;"></small>
                 </div>
+
                 <section class="transaction-form-section">
                     <form id="transaction-form" class="horizontal-form">
                         <div class="form-group type-selector">
@@ -160,7 +138,7 @@
                         <div class="form-group">
                             <select id="category" class="form-control" required>
                                 <option value="" disabled selected>Kategori Seç</option>
-                                </select>
+                            </select>
                         </div>
                         <div class="form-group"><input type="date" id="date" required></div>
                         <button type="submit" id="submit-btn" class="btn-primary">Ekle</button>
@@ -187,10 +165,7 @@
                     </div>
 
                     <div class="card chart-box">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="margin: 0;"><i class="fa-solid fa-chart-pie"></i> Gelir ve Gider Analizi</h3>
-                            <button id="open-sankey-btn" class="list-btn" style="width: auto; padding: 0 15px; background: rgba(74, 108, 247, 0.1); color: var(--primary-color); font-weight: bold;" title="Şelale Görünümü (Sankey)"><i class="fa-solid fa-water"></i> Şelale</button>
-                        </div>
+                        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-chart-pie"></i> Gelir ve Gider Analizi</h3>
                         <div class="chart-container"><canvas id="expenseChart"></canvas></div>
                     </div>
                 </div>
@@ -246,7 +221,7 @@
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);">Yıl:</span>
                             <select id="yearly-status-year" class="form-control" style="width: 100px; padding: 8px 15px; height: auto;">
-                                </select>
+                            </select>
                         </div>
                     </div>
                     <table class="yearly-table">
@@ -259,9 +234,9 @@
                             </tr>
                         </thead>
                         <tbody id="yearly-status-body">
-                            </tbody>
+                        </tbody>
                         <tfoot id="yearly-status-foot">
-                            </tfoot>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -300,54 +275,9 @@
                 </div>
 
                 <div id="notes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; overflow-y: auto; flex: 1; padding-bottom: 20px;">
-                    </div>
-            </div>
-            <div id="warranties-view" style="display: none; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
-                <header class="header-section" style="margin-bottom: 10px;">
-                    <div>
-                        <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Garanti Kasası 🛡️</h1>
-                        <p style="color: var(--text-muted);">Cihazlarınızın fatura ve garanti belgelerini güvenle saklayın.</p>
-                    </div>
-                    <button id="add-warranty-btn" class="btn-primary" style="width: auto; padding: 10px 20px; background: #0f766e; box-shadow: 0 4px 15px rgba(15, 118, 110, 0.2);">
-                        <i class="fa-solid fa-plus"></i> Yeni Belge Ekle
-                    </button>
-                </header>
-
-                <div id="warranty-form-container" class="card premium-note-form" style="display: none; margin-bottom: 15px; border-top: 4px solid #0f766e;">
-                    <div class="note-form-header" style="background: rgba(15, 118, 110, 0.05); color: #0f766e;">
-                        <i class="fa-solid fa-file-shield"></i>
-                        <span>Yeni Garanti Kaydı</span>
-                    </div>
-                    <form id="warranty-form" class="horizontal-form" style="padding: 20px; grid-template-columns: 2fr 1fr 1fr; align-items: end;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Ürün Adı / Model</label>
-                            <input type="text" id="war-name" placeholder="Örn: Samsung TV, Dyson Süpürge" required>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Garanti Bitiş Tarihi</label>
-                            <input type="date" id="war-date" required>
-                        </div>
-                        <div class="form-form-actions" style="display: flex; gap: 10px;">
-                            <button type="button" id="cancel-warranty-btn" class="btn-secondary" style="height: 45px;">İptal</button>
-                            <button type="submit" class="btn-primary" style="background-color: #0f766e; height: 45px;">Kaydet</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div id="warranties-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; overflow-y: auto; flex: 1; padding-bottom: 20px;">
-                    </div>
-            </div>
-
-            <div id="sankey-modal" class="modal-overlay">
-                <div class="modal-content" style="width: 800px; max-width: 95%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="margin:0; color: var(--primary-color);"><i class="fa-solid fa-water"></i> Para Akışı Şelalesi</h3>
-                        <i class="fa-solid fa-xmark" id="close-sankey-btn" style="font-size: 1.5rem; cursor: pointer; color: var(--text-muted);"></i>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; text-align: left;">Bu ayki paranın nerelerden gelip, hangi kategorilere aktığını gösteren akış şemasıdır.</p>
-                    <div id="sankey_basic" style="width: 100%; height: 400px; background: white; border-radius: 12px; border: 1px solid var(--glass-border);"></div>
                 </div>
             </div>
+
             <div id="settings-view" style="display: none; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
                 <header class="header-section" style="margin-bottom: 0px;">
                     <div>
@@ -364,7 +294,7 @@
 
                 <div id="tab-subscriptions" class="settings-tab-content active" style="display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
                     <section class="transaction-form-section" style="flex-shrink: 0; padding: 20px;">
-                        <form id="subscription-form" class="horizontal-form" style="grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1.5fr; align-items: end;">
+                        <form id="subscription-form" class="horizontal-form" style="grid-template-columns: 1fr 1.5fr 1fr 1.5fr; align-items: end;">
                             <div class="form-group" style="margin-bottom:0;">
                                 <select id="sub-category" class="form-control" required>
                                     <option value="" disabled selected>Fatura Türü</option>
@@ -377,13 +307,13 @@
                                 </select>
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
-                                <input type="text" id="sub-name" placeholder="Abonelik Adı (Örn: Ev Elektrik)" required>
+                                <input type="text" id="sub-name" placeholder="Adı (Örn: Elektrik)" required>
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
-                                <input type="text" id="sub-number" placeholder="Abone Numarası" required>
+                                <input type="text" id="sub-number" placeholder="Abone No" required>
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
-                                <input type="number" id="sub-day" placeholder="Ödeme Günü (1-31)" min="1" max="31" required>
+                                <input type="number" id="sub-day" placeholder="Gün (1-31)" min="1" max="31" required>
                             </div>
                             <button type="submit" class="btn-primary" style="height: 100%;">Abonelik Ekle</button>
                         </form>
@@ -391,8 +321,7 @@
 
                     <div class="card history-card" style="flex:1;">
                         <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-list"></i> Kayıtlı Abonelikler</h3>
-                        <ul id="subscription-list" class="transaction-list">
-                            </ul>
+                        <ul id="subscription-list" class="transaction-list"></ul>
                     </div>
                 </div>
 
@@ -418,8 +347,7 @@
 
                     <div class="card history-card" style="flex:1;">
                         <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-tags"></i> Kayıtlı Kategoriler ve Anahtar Kelimeler</h3>
-                        <ul id="category-list" class="transaction-list">
-                            </ul>
+                        <ul id="category-list" class="transaction-list"></ul>
                     </div>
                 </div>
 
@@ -454,12 +382,10 @@
                         <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
                             <h4 style="color: var(--success-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-file-export"></i> Veri Dışa Aktarma ve Raporlama</h4>
                             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Verilerinizi Excel olarak indirebilir veya görsel bir aylık PDF raporu oluşturabilirsiniz.</p>
-                            
                             <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                                 <button id="export-excel-btn" class="btn-primary" style="padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; background-color: var(--success-color); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
                                     <i class="fa-solid fa-file-excel"></i> Excel (CSV) İndir
                                 </button>
-                        
                                 <button id="download-pdf-btn" class="btn-primary" style="padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; background-color: #e11d48; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);">
                                     <i class="fa-solid fa-file-pdf"></i> PDF Rapor Oluştur
                                 </button>
@@ -468,7 +394,6 @@
                         <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
                             <h4 style="color: var(--danger-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Tehlikeli Alan</h4>
                             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Uygulamadaki verilerinizi sıfırlamak için aşağıdaki butona tıklayın ve neleri silmek istediğinizi seçin.</p>
-                            
                             <button id="open-reset-modal-btn" class="btn-secondary" style="padding: 12px 20px; border-radius: 10px; color: var(--danger-color); border: 1px solid var(--danger-color); background: rgba(239, 68, 68, 0.05); font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
                                 <i class="fa-solid fa-skull-crossbones"></i> Verileri Temizle / Sıfırla
                             </button>
@@ -498,11 +423,9 @@
             <p style="color: var(--text-muted); text-align: center; margin-bottom: 20px; font-size: 0.9rem;">Silmek istediğiniz verileri seçin. Bu işlem geri alınamaz!</p>
             
             <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; background: rgba(239, 68, 68, 0.03); padding: 20px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.1);">
-                
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--danger-color); font-weight: 700; border-bottom: 1px solid rgba(239, 68, 68, 0.15); padding-bottom: 12px; margin-bottom: 5px;">
                     <input type="checkbox" id="reset-all" class="danger-checkbox"> Tümünü Seç
                 </label>
-
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-main); font-weight: 500;">
                     <input type="checkbox" id="reset-transactions" class="danger-checkbox reset-item"> Tüm İşlem Geçmişi (Gelir/Gider)
                 </label>
@@ -519,7 +442,6 @@
                     <input type="checkbox" id="reset-settings" class="danger-checkbox reset-item"> Genel Ayarlar (Tema ve Kur)
                 </label>
             </div>
-
             <div class="modal-buttons" style="margin-top: 0;">
                 <button id="confirm-reset-btn" class="btn-primary" style="background-color: var(--danger-color);">Kalıcı Olarak Sil</button>
                 <button id="cancel-reset-btn" class="btn-secondary">İptal</button>
@@ -529,7 +451,6 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

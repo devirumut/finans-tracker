@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finans-tracker-v19';
+const CACHE_NAME = 'finans-tracker-v47 stable';
 const urlsToCache = [
     './',
     './index.html',
@@ -11,7 +11,7 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
     );
-    self.skipWaiting(); // Yeni versiyonu beklemeden hemen devreye al
+    self.skipWaiting();
 });
 
 // 2. Aktifleşme ve Temizlik (ESKİ İNATÇI HAFIZALARI SİLER)
@@ -21,7 +21,6 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(cache => {
                     if (cache !== CACHE_NAME) {
-                        console.log('Eski önbellek silindi:', cache);
                         return caches.delete(cache);
                     }
                 })
