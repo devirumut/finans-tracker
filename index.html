@@ -165,7 +165,24 @@
                     </div>
 
                     <div class="card chart-box">
-                        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-chart-pie"></i> Gelir ve Gider Analizi</h3>
+                        <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; width: 100%;">
+                            <h3 style="margin: 0;"><i class="fa-solid fa-chart-line"></i> Finansal Analiz</h3>
+                            
+                            <div class="chart-selector-group">
+                                <button class="chart-btn active" data-value="doughnut" title="Giderlerin kategorilere göre dağılımı">
+                                    <i class="fa-solid fa-chart-pie"></i>
+                                    <span>Dağılım</span>
+                                </button>
+                                <button class="chart-btn" data-value="bar" title="Kategorilerin birbirleriyle karşılaştırması">
+                                    <i class="fa-solid fa-chart-bar"></i>
+                                    <span>Karşılaştırma</span>
+                                </button>
+                                <button class="chart-btn" data-value="polar" title="Harcamaların merkeze göre yoğunluğu">
+                                    <i class="fa-solid fa-bullseye"></i>
+                                    <span>Yoğunluk</span>
+                                </button>
+                            </div>
+                        </div>
                         <div class="chart-container"><canvas id="expenseChart"></canvas></div>
                     </div>
                 </div>

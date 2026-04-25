@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finans-tracker-v53';
+const CACHE_NAME = 'finans-tracker-v2.2 cp';
 const urlsToCache = [
     './',
     './index.html',

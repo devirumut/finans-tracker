@@ -2284,3 +2284,66 @@ button:focus, input:focus, select:focus, a:focus, .circle-btn:focus, .theme-colo
     /* PC'de ve bazı Android'lerde tıklayınca oluşan mavi kare çerçeveyi yok eder */
     outline: none !important; 
 }
+
+/* ========================================= */
+/* 📊 MODERN GRAFİK SEÇİCİ TASARIMI 📊 */
+/* ========================================= */
+
+.chart-selector-group {
+    display: flex;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 4px;
+    border-radius: 12px;
+    gap: 4px;
+}
+
+body.dark-mode .chart-selector-group {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.chart-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.chart-btn i {
+    font-size: 1rem;
+}
+
+.chart-btn:hover {
+    color: var(--text-main);
+}
+
+.chart-btn.active {
+    background: white;
+    color: var(--primary-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .chart-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobilde yazıların sığması için */
+@media (max-width: 500px) {
+    .chart-btn span {
+        display: none; /* Sadece ikonlar kalsın */
+    }
+    .chart-btn {
+        padding: 10px;
+    }
+}

@@ -54,6 +54,35 @@ const subListEl = document.getElementById('subscription-list');
 const tickerEl = document.getElementById('ticker-content');
 const catForm = document.getElementById('category-form');
 const catListEl = document.getElementById('category-list');
+// YENİ PROJEEE/app.js - Dinamik Grafik Butonları (GÜNCELLENDİ)
+const chartBtns = document.querySelectorAll('.chart-btn');
+let currentChartType = localStorage.getItem('chartType') || 'doughnut';
+
+function updateChartSelectionUI() {
+    chartBtns.forEach(btn => {
+        if (btn.getAttribute('data-value') === currentChartType) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+chartBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentChartType = btn.getAttribute('data-value');
+        localStorage.setItem('chartType', currentChartType);
+        updateChartSelectionUI();
+        init(); // Grafiği tazelemek için
+        
+        // 🚨 DÜZELTME: innerText yerine textContent kullanarak mobilde gizli olan ismi de alıyoruz
+        const chartName = btn.querySelector('span') ? btn.querySelector('span').textContent.trim() : "Grafik";
+        showNotify(`${chartName} moduna geçildi`, "fa-chart-line");
+    });
+});
+
+// Sayfa yüklendiğinde aktif olanı işaretle
+updateChartSelectionUI();
 
 // ==========================================
 // 3. VERİ DEPOLARI VE VARSAYILANLAR
@@ -379,14 +408,101 @@ function generateAIInsights(transactions, totalInc, totalExp) {
     }
 }
 
+// YENİ PROJEEE/app.js - Güncel updateChart Fonksiyonu
 function updateChart(currentTransactions) {
     if(!ctx) return;
-    let totalIncome = 0; const expenseCats = {};
-    currentTransactions.forEach(t => { if (t.amount > 0) { totalIncome += t.amount; } else { expenseCats[t.category] = (expenseCats[t.category] || 0) + Math.abs(t.amount); } });
-    const labels = ['Toplam Gelir', ...Object.keys(expenseCats)]; const dataValues = [totalIncome, ...Object.values(expenseCats)];
-    const bgColors = ['#10b981', '#ef4444', '#f97316', '#f59e0b', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'];
     if (expenseChartInstance) expenseChartInstance.destroy();
-    expenseChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: dataValues, backgroundColor: bgColors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false } });
+
+    let totalIncome = 0; 
+    const expenseCats = {};
+    
+    currentTransactions.forEach(t => { 
+        if (t.amount > 0) { totalIncome += t.amount; } 
+        else { expenseCats[t.category] = (expenseCats[t.category] || 0) + Math.abs(t.amount); } 
+    });
+
+    const bgColors = ['#10b981', '#ef4444', '#f97316', '#f59e0b', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'];
+
+    // 1. KLASİK PASTA GRAFİĞİ
+    if (currentChartType === 'doughnut') {
+        const labels = ['Toplam Gelir', ...Object.keys(expenseCats)]; 
+        const dataValues = [totalIncome, ...Object.values(expenseCats)];
+        
+        expenseChartInstance = new Chart(ctx, { 
+            type: 'doughnut', 
+            data: { labels: labels, datasets: [{ data: dataValues, backgroundColor: bgColors, borderWidth: 0 }] }, 
+            options: { responsive: true, maintainAspectRatio: false, animation: { duration: 400 } } 
+        });
+    } 
+    // 2. ÇUBUK (BAR) GRAFİĞİ
+    else if (currentChartType === 'bar') {
+        const labels = ['Toplam Gelir', ...Object.keys(expenseCats)]; 
+        const dataValues = [totalIncome, ...Object.values(expenseCats)];
+        
+        expenseChartInstance = new Chart(ctx, { 
+            type: 'bar', 
+            data: { labels: labels, datasets: [{ label: 'Tutar', data: dataValues, backgroundColor: bgColors, borderRadius: 6 }] }, 
+            options: { 
+                responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            } 
+        });
+    } 
+    // 3. GİDER YOĞUNLUĞU (Polar Area / Kutup Grafiği)
+    else if (currentChartType === 'polar') {
+        const labels = Object.keys(expenseCats); 
+        const dataValues = Object.values(expenseCats);
+        
+        // Eğer henüz harcama girilmemişse grafik boş kalmasın
+        if (labels.length === 0) {
+            labels.push('Henüz Harcama Yok');
+            dataValues.push(1);
+        }
+
+        expenseChartInstance = new Chart(ctx, { 
+            type: 'polarArea', 
+            data: { 
+                labels: labels, 
+                datasets: [{ 
+                    data: dataValues, 
+                    // Saydam (transparan) renkler veriyoruz ki üst üste bindiğinde şık dursun
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.75)',   // Kırmızı
+                        'rgba(249, 115, 22, 0.75)',  // Turuncu
+                        'rgba(245, 158, 11, 0.75)',  // Sarı
+                        'rgba(6, 182, 212, 0.75)',   // Turkuaz
+                        'rgba(59, 130, 246, 0.75)',  // Mavi
+                        'rgba(139, 92, 246, 0.75)',  // Mor
+                        'rgba(217, 70, 239, 0.75)'   // Pembe
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff' // Dilimlerin arasını beyaz kesiklerle ayırır
+                }] 
+            }, 
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                animation: { duration: 700, easing: 'easeOutBounce' }, // Açılırken hafif zıplama efekti
+                plugins: { 
+                    legend: { display: false }, // Karmaşayı önlemek için yazıları gizliyoruz
+                    tooltip: { 
+                        callbacks: { 
+                            label: function(context) { 
+                                return ` ${currentCurrency}${context.raw.toFixed(2)}`; 
+                            } 
+                        } 
+                    }
+                },
+                scales: {
+                    r: {
+                        ticks: { display: false }, // Merkezdeki sayıları gizler
+                        grid: { color: 'rgba(0,0,0,0.08)' } // Arka plandaki radar çizgilerini hafifletir
+                    }
+                }
+            } 
+        });
+    }
 }
 
 function init() {
