@@ -2270,3 +2270,17 @@ html, body {
         transform: translateY(0); /* Yerine şık bir şekilde oturur */
     }
 }
+
+/* ========================================= */
+/* 🚫 MAVİ TIKLAMA LEKESİ VE FOCUS İPTALİ 🚫 */
+/* ========================================= */
+
+* {
+    /* Mobilde (özellikle iPhone/Safari) dokunurken çıkan mavi transparan lekeyi yok eder */
+    -webkit-tap-highlight-color: transparent !important; 
+}
+
+button:focus, input:focus, select:focus, a:focus, .circle-btn:focus, .theme-color-btn:focus {
+    /* PC'de ve bazı Android'lerde tıklayınca oluşan mavi kare çerçeveyi yok eder */
+    outline: none !important; 
+}
