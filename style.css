@@ -2183,3 +2183,90 @@ html, body {
     }
 }
 
+/* ========================================= */
+/* 📱 MOBİL SOL MENÜ SIKIŞTIRMA YAMASI 📱 */
+/* ========================================= */
+
+@media (max-width: 850px) {
+    /* 1. Menünün ana iç boşluklarını (Padding) daralt */
+    .sidebar {
+        padding: 20px 15px !important;
+    }
+
+    /* 2. Logonun altındaki o 60px'lik devasa boşluğu tırpanla */
+    .logo {
+        margin-bottom: 15px !important;
+        padding-bottom: 15px !important;
+    }
+
+    /* 3. Google Giriş alanının altındaki boşluğu kıs */
+    #login-container {
+        margin-bottom: 15px !important;
+    }
+
+    /* 4. Profil kartının hem iç hem dış boşluklarını daralt */
+    .user-profile {
+        padding: 12px 0 !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* 5. Avatarı hafif küçült (Dikeyde yer kazandırır) */
+    #user-photo {
+        width: 48px !important;
+        height: 48px !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* 6. Çıkış Yap butonunun boşluklarını azalt */
+    .btn-logout {
+        margin-top: 5px !important;
+        padding: 4px 10px !important;
+    }
+
+    /* 7. Menü sekmelerini (Özet, Takvim vs.) çok hafif daralt */
+    .menu a {
+        padding: 10px 15px !important;
+    }
+    
+    /* 8. Drive butonları grubunu yukarı çek */
+    .menu > div[style*="margin-top: auto"] {
+        padding-top: 10px !important;
+    }
+}
+
+/* ========================================= */
+/* ✨ MENÜ VE SAYFA GEÇİŞ EFEKTLERİ YAMASI ✨ */
+/* ========================================= */
+
+/* 1. Menü Butonları (Özet, Takvim vb.) Pürüzsüz Hover ve Aktif Efekti */
+.menu a {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.menu a:active {
+    transform: scale(0.95) !important; /* Tıklarken hafifçe içe göçme (Dokunma hissi) */
+}
+
+/* 2. Menü açılıp kapanırken animasyonun kopmamasını garantiye alıyoruz */
+@media (max-width: 850px) {
+    .sidebar {
+        transition: left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    }
+}
+
+/* 3. SAYFALAR ARASI GEÇİŞ ANİMASYONU (Premium Hissiyat) */
+/* Özet'ten Takvim'e vs. geçerken sayfanın küt diye gelmesi yerine süzülmesini sağlar */
+#dashboard-view, #calendar-view, #yearly-view, #notes-view, #settings-view {
+    animation: sayfaGecisi 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards !important;
+}
+
+@keyframes sayfaGecisi {
+    0% {
+        opacity: 0;
+        transform: translateY(15px); /* Hafifçe aşağıdan başlar */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0); /* Yerine şık bir şekilde oturur */
+    }
+}
