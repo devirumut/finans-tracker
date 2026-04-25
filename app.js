@@ -72,6 +72,16 @@ const menuDocuments = document.getElementById('menu-documents');
 const documentsView = document.getElementById('documents-view');
 let documents = JSON.parse(localStorage.getItem('documents')) || [];
 
+// YENİ PROJEEE/app.js 
+let userSalary = parseFloat(localStorage.getItem('userSalary')) || 0;
+let userWorkHours = parseFloat(localStorage.getItem('userWorkHours')) || 160;
+
+const settingSalaryEl = document.getElementById('setting-salary');
+const settingWorkHoursEl = document.getElementById('setting-work-hours');
+const saveTimeMoneyBtn = document.getElementById('save-time-money-btn');
+const timeCostDisplay = document.getElementById('time-cost-display');
+const timeCostValue = document.getElementById('time-cost-value');
+
 chartBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         currentChartType = btn.getAttribute('data-value');
@@ -87,6 +97,18 @@ chartBtns.forEach(btn => {
 
 // Sayfa yüklendiğinde aktif olanı işaretle
 updateChartSelectionUI();
+
+
+if(settingWorkHoursEl) settingWorkHoursEl.value = userWorkHours || 160;
+
+if(saveTimeMoneyBtn) {
+    saveTimeMoneyBtn.onclick = () => {
+        userWorkHours = parseFloat(settingWorkHoursEl.value) || 160;
+        localStorage.setItem('userWorkHours', userWorkHours);
+        showNotify("Çalışma saati kaydedildi!", "fa-check");
+        if(accessToken) backupToDrive(true);
+    };
+}
 
 // ==========================================
 // 3. VERİ DEPOLARI VE VARSAYILANLAR
@@ -300,7 +322,7 @@ async function backupToDrive(isSilent = false) {
         userCategories, 
         notes,
         documents, // 🚨 YENİ EKLENDİ
-        settings: { currency: currentCurrency, theme: currentColorTheme } 
+        settings: { currency: currentCurrency, theme: currentColorTheme, salary: userSalary, workHours: userWorkHours } 
     };
     const fileContent = JSON.stringify(backupData);
     const metadata = { name: 'finans_yedek.json', mimeType: 'application/json' };
@@ -326,14 +348,22 @@ async function syncFromDrive() {
             
             if (Array.isArray(parsedData)) { transactions = parsedData; subscriptions = []; userCategories = defaultCategories; notes = []; } 
             // syncFromDrive içindeki else bloğu
-else { 
-    transactions = parsedData.transactions || []; 
-    subscriptions = parsedData.subscriptions || [];
-    userCategories = parsedData.userCategories || defaultCategories; 
-    notes = parsedData.notes || [];
-    documents = parsedData.documents || []; // 🚨 YENİ EKLENDİ
-    // ...
-}
+            else { 
+                // Mevcut verileri çekiyoruz
+                transactions = parsedData.transactions || []; 
+                subscriptions = parsedData.subscriptions || [];
+                userCategories = parsedData.userCategories || defaultCategories; 
+                notes = parsedData.notes || [];
+                documents = parsedData.documents || [];
+            
+                // ⏳ ZAMAN = PARA AYARLARINI BURADA ATIYORUZ
+                // SADECE ÇALIŞMA SAATİNİ İNDİR (Maaş artık işlem geçmişinden bulunuyor)
+            if (parsedData.settings) {
+                userWorkHours = parsedData.settings.workHours || 160;
+                localStorage.setItem('userWorkHours', userWorkHours);
+                if(settingWorkHoursEl) settingWorkHoursEl.value = userWorkHours || 160;
+            }
+            }
             localStorage.setItem('documents', JSON.stringify(documents)); // 🚨 YENİ EKLENDİ
             localStorage.setItem('transactions', JSON.stringify(transactions)); localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
             localStorage.setItem('userCategories', JSON.stringify(userCategories)); localStorage.setItem('notes', JSON.stringify(notes));
@@ -343,6 +373,25 @@ else {
             showNotify("Veriler başarıyla indirildi!", "fa-cloud-arrow-down");
         } else { showNotify("Bulutta yedek bulunamadı.", "fa-circle-info"); }
     } catch (e) { showNotify("İndirme Hatası!", "fa-circle-xmark"); }
+}
+
+function getAutoSalary() {
+    const salaryTrans = transactions.filter(t => t.amount > 0 && t.category && t.category.toLowerCase().includes('maaş'));
+    return salaryTrans.length > 0 ? salaryTrans[salaryTrans.length - 1].amount : 0;
+}
+
+function getTimeCostString(amount) {
+    const salary = getAutoSalary();
+    if (salary <= 0 || userWorkHours <= 0) return null;
+    
+    const hourlyWage = salary / userWorkHours;
+    const totalHours = Math.abs(amount) / hourlyWage;
+    
+    if (totalHours < 1) return `${Math.round(totalHours * 60)} dk`;
+    if (totalHours < 8) return `${totalHours.toFixed(1)} saat`;
+    const days = Math.floor(totalHours / 8);
+    const rem = (totalHours % 8).toFixed(1);
+    return rem > 0 ? `${days}g ${rem}s` : `${days} gün`;
 }
 
 // ==========================================
@@ -371,7 +420,9 @@ function addTransactionDOM(t) {
     const item = document.createElement('li'); item.classList.add('transaction-item');
     const isPaid = t.isPaid !== false; if (t.amount < 0 && !isPaid) item.classList.add('unpaid-item'); 
     const sign = t.amount < 0 ? '-' : '+';
-    let statusBadge = ''; let actionBtns = `<button class="list-btn edit-btn" onclick="editTransaction(${t.id})" title="Düzenle"><i class="fa-regular fa-pen-to-square"></i></button><button class="list-btn delete-btn" onclick="removeTransaction(${t.id})" title="Sil"><i class="fa-regular fa-trash-can"></i></button>`;
+    let statusBadge = ''; 
+    let actionBtns = `<button class="list-btn edit-btn" onclick="editTransaction(${t.id})" title="Düzenle"><i class="fa-regular fa-pen-to-square"></i></button><button class="list-btn delete-btn" onclick="removeTransaction(${t.id})" title="Sil"><i class="fa-regular fa-trash-can"></i></button>`;
+    
     if (t.amount < 0) {
         if (isPaid) {
             statusBadge = `<span class="category-badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color);"><i class="fa-solid fa-check"></i> Ödendi</span>`;
@@ -381,9 +432,36 @@ function addTransactionDOM(t) {
             actionBtns = `<button class="list-btn pay-btn" onclick="togglePaymentStatus(${t.id})" title="Ödendi İşaretle"><i class="fa-solid fa-check"></i> Öde</button>` + actionBtns;
         }
     }
-    item.innerHTML = `<div class="transaction-info"><span style="display:flex; align-items:center; gap:8px;">${t.text} <span class="category-badge">${t.category}</span> ${statusBadge}</span><small>${new Date(t.date).toLocaleDateString('tr-TR')}</small></div><div style="display:flex; align-items:center; gap:8px;"><span class="transaction-amount ${t.amount < 0 ? 'amount-minus' : 'amount-plus'}" style="margin-right: 10px;">${sign}${currentCurrency}${Math.abs(t.amount).toFixed(2)}</span><div style="display:flex; gap:5px;">${actionBtns}</div></div>`;
+
+    // ⏳ Zaman maliyeti hesapla ve ikonu oluştur
+    const timeCost = (t.amount < 0) ? getTimeCostString(t.amount) : null;
+    const timeHtml = timeCost ? `
+        <i class="fa-solid fa-circle-info time-info-btn" onclick="toggleTimeCost(this)" title="Zaman Maliyeti"></i>
+        <span class="time-cost-badge">⌛ ${timeCost}</span>
+    ` : '';
+
+    // Tüm yapıyı TEK SEFERDE HTML'e basıyoruz (Eski ezilme sorunu çözüldü)
+    item.innerHTML = `
+        <div class="transaction-info">
+            <span style="display:flex; align-items:center; gap:8px;">
+                ${t.text} <span class="category-badge">${t.category}</span> ${statusBadge} ${timeHtml}
+            </span>
+            <small>${new Date(t.date).toLocaleDateString('tr-TR')}</small>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="transaction-amount ${t.amount < 0 ? 'amount-minus' : 'amount-plus'}" style="margin-right: 10px;">${sign}${currentCurrency}${Math.abs(t.amount).toFixed(2)}</span>
+            <div style="display:flex; gap:5px;">${actionBtns}</div>
+        </div>
+    `;
     if (listEl) listEl.appendChild(item);
 }
+
+// İkon tıklama mantığı (Artık sorunsuz çalışacak)
+window.toggleTimeCost = (btn) => {
+    const badge = btn.nextElementSibling;
+    const isOpen = badge.style.display === 'inline-block';
+    badge.style.display = isOpen ? 'none' : 'inline-block';
+};
 
 function updateValues(currentTransactions) {
     const total = currentTransactions.reduce((acc, t) => acc + t.amount, 0).toFixed(2);
@@ -1416,5 +1494,69 @@ if (confirmResetBtn) {
             }
             // ...
         }
+    });
+}
+
+if (amountEl) amountEl.addEventListener('input', calculateTimeCost);
+if (typeExpense) typeExpense.addEventListener('change', calculateTimeCost);
+if (typeIncome) typeIncome.addEventListener('change', calculateTimeCost);
+
+function calculateTimeCost() {
+    if (!timeCostDisplay || !timeCostValue) return;
+    
+    const amount = parseFloat(amountEl.value) || 0;
+    const isExpense = typeExpense && typeExpense.checked; 
+
+    // Ekranda bir şey yoksa veya gelir seçiliyse gizle
+    if (amount <= 0 || !isExpense || userWorkHours <= 0) {
+        timeCostDisplay.style.display = 'none';
+        return;
+    }
+
+    // 🤖 AKILLI MAAŞ BULUCU: "Maaş" kelimesi geçen son geliri bulur
+    let autoSalary = 0;
+    const salaryTransactions = transactions.filter(t => t.amount > 0 && t.category && t.category.toLowerCase().includes('maaş'));
+    
+    if (salaryTransactions.length > 0) {
+        // En son eklenen maaşı al
+        autoSalary = salaryTransactions[salaryTransactions.length - 1].amount;
+    }
+
+    // Eğer sistemde hiç maaş kaydı yoksa uyarı verme
+    if (autoSalary <= 0) {
+        timeCostDisplay.style.display = 'none';
+        return;
+    }
+
+    // Hesaplama (Saatlik Ücret = Otomatik Bulunan Maaş / Çalışma Saati)
+    const hourlyWage = autoSalary / userWorkHours;
+    const totalHoursNeeded = amount / hourlyWage;
+
+    let timeString = "";
+    if (totalHoursNeeded < 1) {
+        const mins = Math.round(totalHoursNeeded * 60);
+        timeString = `${mins} dk`;
+    } else if (totalHoursNeeded < 8) { 
+        timeString = `${totalHoursNeeded.toFixed(1)} saat`;
+    } else {
+        const days = Math.floor(totalHoursNeeded / 8);
+        const remainingHours = (totalHoursNeeded % 8).toFixed(1);
+        timeString = remainingHours > 0 ? `${days} gün ${remainingHours} saat` : `${days} gün`;
+    }
+
+    timeCostValue.innerText = timeString;
+    timeCostDisplay.style.display = 'block';
+}
+
+if(formEl) {
+    formEl.addEventListener('reset', () => {
+        if(timeCostDisplay) timeCostDisplay.style.display = 'none';
+    });
+}
+
+// Form sıfırlandığında uyarıyı da gizle (Mevcut form.onsubmit içine ekle)
+if(formEl) {
+    formEl.addEventListener('reset', () => {
+        if(timeCostDisplay) timeCostDisplay.style.display = 'none';
     });
 }

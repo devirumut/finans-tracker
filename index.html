@@ -129,12 +129,12 @@
                             <label for="type-expense" class="type-btn expense-btn"><i class="fa-solid fa-arrow-trend-down"></i> Gider</label>
                         </div>
                         <div class="form-group"><input type="text" id="text" placeholder="İşlem Adı" required></div>
-                        <div class="form-group" style="display: flex; gap: 10px;">
-                            <input type="number" id="amount" placeholder="Tutar (₺)" min="0" step="0.01" required style="flex: 1;">
-                            <button type="button" id="scan-receipt-btn" class="btn-secondary" style="width: auto; padding: 0 15px; border-radius: 10px;" title="Fiş Tara">
-                                <i class="fa-solid fa-camera"></i>
-                            </button>
-                            <input type="file" id="receipt-camera" accept="image/*" capture="environment" style="display: none;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="amount" placeholder="Tutar (₺)" min="0" step="0.01" required style="flex: 1;">
+                                <button type="button" id="scan-receipt-btn" class="btn-secondary" style="width: auto; padding: 0 15px; border-radius: 10px;" title="Fiş Tara"><i class="fa-solid fa-camera"></i></button>
+                                <input type="file" id="receipt-camera" accept="image/*" capture="environment" style="display: none;">
+                            </div>
                         </div>
                         <div class="form-group">
                             <select id="category" class="form-control" required>
@@ -463,6 +463,21 @@
                                 </button>
                             </div>
                         </div>
+                        
+                        <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
+                            <h4 style="color: #f59e0b; margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-hourglass-half"></i> Zaman = Para (Psikolojik Kalkan)</h4>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Aylık ortalama çalışma saatinizi girin. Sistem, maaşınızı "Maaş" olarak eklediğiniz gelirlerden otomatik bulur ve harcamalarınızın ömrünüzden kaç saat götürdüğünü hesaplar.</p>
+                            <div style="display: flex; gap: 20px; margin-bottom: 15px; align-items: flex-end;">
+                                <div class="form-group" style="margin-bottom: 0; width: 200px;">
+                                    <label style="font-size: 0.85rem;">Aylık Çalışma Saati</label>
+                                    <input type="number" id="setting-work-hours" class="form-control" placeholder="Örn: 160" value="160" style="padding: 10px;">
+                                </div>
+                                <button id="save-time-money-btn" class="btn-primary" style="width: auto; padding: 12px 30px; background-color: #f59e0b; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2); border: none;">
+                                    <i class="fa-solid fa-clock-rotate-left"></i> Yapılandırmayı Güncelle
+                                </button>
+                            </div>
+                        </div>
+
                         <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
                             <h4 style="color: var(--danger-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Tehlikeli Alan</h4>
                             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Uygulamadaki verilerinizi sıfırlamak için aşağıdaki butona tıklayın ve neleri silmek istediğinizi seçin.</p>

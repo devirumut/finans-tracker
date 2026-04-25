@@ -2459,3 +2459,50 @@ body.dark-mode .chart-btn.active {
 .custom-file-label i {
     font-size: 1.2rem;
 }
+
+/* ========================================= */
+/* ⏳ ZAMAN = PARA ANİMASYONU ⏳ */
+/* ========================================= */
+#time-cost-display {
+    animation: fadeInSlideDown 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes fadeInSlideDown {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================= */
+/* ⏳ ZAMAN=PARA LİSTE İKONU VE MODERN BUTON ⏳ */
+/* ========================================= */
+
+.time-info-btn {
+    color: #f59e0b;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: 5px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.time-info-btn:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.time-cost-badge {
+    font-size: 0.7rem;
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    margin-left: 5px;
+    display: none; /* Tıklayınca açılacak */
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
