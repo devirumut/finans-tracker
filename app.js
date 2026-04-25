@@ -67,6 +67,10 @@ function updateChartSelectionUI() {
         }
     });
 }
+// YENİ PROJEEE/app.js - Başlangıca ekle
+const menuDocuments = document.getElementById('menu-documents');
+const documentsView = document.getElementById('documents-view');
+let documents = JSON.parse(localStorage.getItem('documents')) || [];
 
 chartBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -151,10 +155,19 @@ if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-m
 // ==========================================
 // 5. YARDIMCI FONKSİYONLAR VE BİLDİRİMLER
 // ==========================================
+// YENİ PROJEEE/app.js - setDefaultDate fonksiyonunu güncelle
 function setDefaultDate() {
-    const today = new Date(); today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-    const dateString = today.toISOString().split('T')[0]; const monthString = dateString.substring(0, 7);
-    if (dateEl) dateEl.value = dateString; if (monthFilterEl && !monthFilterEl.value) monthFilterEl.value = monthString;
+    const today = new Date(); 
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const dateString = today.toISOString().split('T')[0]; 
+    const monthString = dateString.substring(0, 7);
+    
+    if (dateEl) dateEl.value = dateString; 
+    if (monthFilterEl && !monthFilterEl.value) monthFilterEl.value = monthString;
+    
+    // 🚨 YENİ: Belge ekleme tarihi otomatik bugün olsun
+    const docDateEl = document.getElementById('doc-date');
+    if (docDateEl) docDateEl.value = dateString;
 }
 
 /* ========================================= */
@@ -187,10 +200,10 @@ if (hamburgerBtn && sidebar && mobileOverlay) {
     mobileOverlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); mobileOverlay.classList.remove('active'); });
 }
 
+// switchMenu fonksiyonu içine documents ekle
 function switchMenu(activeMenuBtn, activeViewDiv) {
-    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); });
-    [dashboardView, calendarView, yearlyView, notesView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
-    
+    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuDocuments, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); });
+    [dashboardView, calendarView, yearlyView, notesView, documentsView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
     if(activeMenuBtn) activeMenuBtn.classList.add('active');
     if(activeViewDiv) activeViewDiv.style.display = 'flex';
 
@@ -204,6 +217,7 @@ if(menuDashboard) menuDashboard.onclick = (e) => { e.preventDefault(); switchMen
 if(menuCalendar) menuCalendar.onclick = (e) => { e.preventDefault(); switchMenu(menuCalendar, calendarView); renderCalendar(); };
 if(menuYearly) menuYearly.onclick = (e) => { e.preventDefault(); switchMenu(menuYearly, yearlyView); initYearlyStatus(); };
 if(menuNotes) menuNotes.onclick = (e) => { e.preventDefault(); switchMenu(menuNotes, notesView); initNotes(); };
+if(menuDocuments) menuDocuments.onclick = (e) => { e.preventDefault(); switchMenu(menuDocuments, documentsView); initDocuments(); };
 if(menuSettings) menuSettings.onclick = (e) => { e.preventDefault(); switchMenu(menuSettings, settingsView); };
 
 const settingsTabs = document.querySelectorAll('.settings-tab-btn');
@@ -279,9 +293,13 @@ if (fetchBtn) fetchBtn.onclick = async () => { if (!accessToken) { showNotify("L
 if (backupBtn) backupBtn.onclick = async () => { if (!accessToken) { showNotify("Lütfen önce Google ile giriş yapın!", "fa-triangle-exclamation"); return; } await backupToDrive(false); };
 
 async function backupToDrive(isSilent = false) {
-    if(!isSilent) showNotify("Yedekleniyor...", "fa-spinner fa-spin");
+    // ...
     const backupData = { 
-        transactions: transactions, subscriptions: subscriptions, userCategories: userCategories, notes: notes,
+        transactions, 
+        subscriptions, 
+        userCategories, 
+        notes,
+        documents, // 🚨 YENİ EKLENDİ
         settings: { currency: currentCurrency, theme: currentColorTheme } 
     };
     const fileContent = JSON.stringify(backupData);
@@ -307,12 +325,16 @@ async function syncFromDrive() {
             const parsedData = await file.json();
             
             if (Array.isArray(parsedData)) { transactions = parsedData; subscriptions = []; userCategories = defaultCategories; notes = []; } 
-            else { 
-                transactions = parsedData.transactions || []; subscriptions = parsedData.subscriptions || [];
-                userCategories = parsedData.userCategories || defaultCategories; notes = parsedData.notes || [];
-                if(parsedData.settings) { currentCurrency = parsedData.settings.currency || '₺'; currentColorTheme = parsedData.settings.theme || 'default'; }
-            }
-            
+            // syncFromDrive içindeki else bloğu
+else { 
+    transactions = parsedData.transactions || []; 
+    subscriptions = parsedData.subscriptions || [];
+    userCategories = parsedData.userCategories || defaultCategories; 
+    notes = parsedData.notes || [];
+    documents = parsedData.documents || []; // 🚨 YENİ EKLENDİ
+    // ...
+}
+            localStorage.setItem('documents', JSON.stringify(documents)); // 🚨 YENİ EKLENDİ
             localStorage.setItem('transactions', JSON.stringify(transactions)); localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
             localStorage.setItem('userCategories', JSON.stringify(userCategories)); localStorage.setItem('notes', JSON.stringify(notes));
             localStorage.setItem('currency', currentCurrency); localStorage.setItem('colorTheme', currentColorTheme); 
@@ -874,6 +896,7 @@ document.querySelectorAll('.reset-item').forEach(item => {
     });
 });
 
+// YENİ PROJEEE/app.js - Sıfırlama Butonu Bloğunu Bununla Değiştir
 if (confirmResetBtn) {
     confirmResetBtn.addEventListener('click', async () => {
         const chkTrans = document.getElementById('reset-transactions').checked;
@@ -881,8 +904,13 @@ if (confirmResetBtn) {
         const chkCats = document.getElementById('reset-categories').checked;
         const chkNotes = document.getElementById('reset-notes').checked;
         const chkSettings = document.getElementById('reset-settings').checked;
+        const chkDocs = document.getElementById('reset-documents').checked;
 
-        if (!chkTrans && !chkSubs && !chkCats && !chkNotes && !chkSettings) { showNotify("Lütfen silmek için en az bir veri türü seçin!", "fa-triangle-exclamation"); return; }
+        // 🚨 DÜZELTME: chkDocs (!chkDocs) kontrolü buraya eklendi!
+        if (!chkTrans && !chkSubs && !chkCats && !chkNotes && !chkSettings && !chkDocs) { 
+            showNotify("Lütfen silmek için en az bir veri türü seçin!", "fa-triangle-exclamation"); 
+            return; 
+        }
         
         if (confirm("⚠️ DİKKAT: Seçtiğiniz veriler kalıcı olarak silinecektir! Onaylıyor musunuz?")) {
             if (chkTrans) { transactions = []; localStorage.removeItem('transactions'); init(); }
@@ -890,6 +918,9 @@ if (confirmResetBtn) {
             if (chkCats) { userCategories = defaultCategories; localStorage.removeItem('userCategories'); initCategories(); }
             if (chkNotes) { notes = []; localStorage.removeItem('notes'); initNotes(); }
             if (chkSettings) { currentCurrency = '₺'; currentColorTheme = 'default'; localStorage.removeItem('currency'); localStorage.removeItem('colorTheme'); applyGeneralSettings(); }
+            
+            // Belgeleri Silme Komutu
+            if (chkDocs) { documents = []; localStorage.removeItem('documents'); initDocuments(); }
             
             if (resetModal) resetModal.style.display = 'none';
             document.querySelectorAll('.danger-checkbox').forEach(cb => cb.checked = false);
@@ -1273,5 +1304,117 @@ if (downloadPdfBtn) {
         html2pdf().set(opt).from(reportTemplate).save().then(() => {
             showNotify("Profesyonel PDF Rapor İndirildi!", "fa-file-pdf");
         });
+    });
+}
+
+// BELGE YÜKLEME VE LİSTELEME MANTIĞI
+const addDocBtn = document.getElementById('add-doc-btn');
+const docFormContainer = document.getElementById('doc-form-container');
+const docUploadForm = document.getElementById('document-upload-form');
+const cancelDocBtn = document.getElementById('cancel-doc-btn');
+
+if(addDocBtn) addDocBtn.onclick = () => docFormContainer.style.display = 'block';
+if(cancelDocBtn) cancelDocBtn.onclick = () => { docFormContainer.style.display = 'none'; docUploadForm.reset(); };
+
+// YENİ PROJEEE/app.js - docUploadForm.onsubmit içeriğini güncelleyin
+if(docUploadForm) {
+    docUploadForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('doc-file');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const newDoc = {
+                id: Date.now(),
+                name: document.getElementById('doc-name').value,
+                category: document.getElementById('doc-category').value,
+                date: document.getElementById('doc-date').value,
+                description: document.getElementById('doc-desc').value, // 🚨 AÇIKLAMA EKLENDİ
+                fileData: event.target.result,
+                fileType: file.type
+            };
+
+            documents.unshift(newDoc);
+            localStorage.setItem('documents', JSON.stringify(documents));
+            initDocuments();
+            cancelDocBtn.onclick(); // Formu kapat ve sıfırla
+            showNotify("Belge arşive eklendi!", "fa-file-shield");
+            if(accessToken) backupToDrive(true);
+        };
+        reader.readAsDataURL(file);
+    };
+}
+
+// YENİ PROJEEE/app.js - initDocuments fonksiyonunu güncelleyin
+function initDocuments() {
+    const grid = document.getElementById('documents-grid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    
+    if(documents.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted);"><i class="fa-solid fa-box-open fa-3x" style="margin-bottom: 10px;"></i><p>Arşiviniz henüz boş.</p></div>';
+        return;
+    }
+
+    documents.forEach(doc => {
+        const div = document.createElement('div');
+        div.className = 'doc-card';
+        const icon = doc.category === 'Fiş' ? 'fa-receipt' : doc.category === 'Fatura' ? 'fa-file-invoice-dollar' : 'fa-certificate';
+        
+        // Açıklama varsa göster
+        const descHtml = doc.description ? `<p title="${doc.description}">${doc.description}</p>` : '';
+
+        div.innerHTML = `
+            <div class="doc-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="doc-info">
+                <h4>${doc.name}</h4>
+                <small>${doc.category} • ${new Date(doc.date).toLocaleDateString('tr-TR')}</small>
+                ${descHtml}
+            </div>
+            <div class="doc-actions">
+                <a href="${doc.fileData}" download="${doc.name}" class="doc-preview-btn" title="İndir"><i class="fa-solid fa-download"></i></a>
+                <i class="fa-solid fa-trash-can delete-note" onclick="deleteDocument(${doc.id})" title="Sil" style="position:static; margin-left:10px; cursor:pointer;"></i>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+}
+
+window.deleteDocument = (id) => {
+    if(confirm("Bu belgeyi silmek istediğinize emin misiniz?")) {
+        documents = documents.filter(d => d.id !== id);
+        localStorage.setItem('documents', JSON.stringify(documents));
+        initDocuments();
+        showNotify("Belge silindi.", "fa-trash");
+        if(accessToken) backupToDrive(true);
+    }
+};
+
+// YENİ PROJEEE/app.js - Dosya seçildiğinde ismini göster
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'doc-file') {
+        const fileName = e.target.files[0] ? e.target.files[0].name : "Dosya Seç veya Foto Çek";
+        const display = document.getElementById('file-name-display');
+        if (display) display.textContent = fileName.length > 20 ? fileName.substring(0, 17) + "..." : fileName;
+    }
+});
+
+// YENİ PROJEEE/app.js - confirmResetBtn.addEventListener içinde belgeleri ekle
+if (confirmResetBtn) {
+    confirmResetBtn.addEventListener('click', async () => {
+        // ... (diğer checkbox tanımları)
+        const chkDocs = document.getElementById('reset-documents').checked; // 🚨 YENİ
+
+        if (confirm("⚠️ DİKKAT: Seçtiğiniz veriler kalıcı olarak silinecektir! Onaylıyor musunuz?")) {
+            // ... (diğer if kontrolleri)
+            if (chkDocs) { 
+                documents = []; 
+                localStorage.removeItem('documents'); 
+                initDocuments(); 
+            }
+            // ...
+        }
     });
 }

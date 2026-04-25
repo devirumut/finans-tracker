@@ -2255,8 +2255,8 @@ html, body {
 }
 
 /* 3. SAYFALAR ARASI GEÇİŞ ANİMASYONU (Premium Hissiyat) */
-/* Özet'ten Takvim'e vs. geçerken sayfanın küt diye gelmesi yerine süzülmesini sağlar */
-#dashboard-view, #calendar-view, #yearly-view, #notes-view, #settings-view {
+/* Belgeler (documents-view) sayfası da eklendi! */
+#dashboard-view, #calendar-view, #yearly-view, #notes-view, #documents-view, #settings-view {
     animation: sayfaGecisi 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards !important;
 }
 
@@ -2346,4 +2346,116 @@ body.dark-mode .chart-btn.active {
     .chart-btn {
         padding: 10px;
     }
+}
+
+/* ========================================= */
+/* 📁 BELGE KASASI TASARIMI 📁 */
+/* ========================================= */
+
+.doc-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.doc-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--soft-shadow);
+    border-color: var(--primary-color);
+}
+
+.doc-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(74, 108, 247, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.doc-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.doc-info h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-info small {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.doc-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.doc-preview-btn {
+    color: var(--success-color);
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+/* YENİ PROJEEE/style.css - Belge Kartı Güncellemesi */
+.doc-info p {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Mobilde formun taşmaması için */
+@media (max-width: 850px) {
+    #document-upload-form .horizontal-form {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ========================================= */
+/* 📂 ÖZELLEŞTİRİLMİŞ DOSYA SEÇME BUTONU 📂 */
+/* ========================================= */
+
+.custom-file-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(74, 108, 247, 0.05);
+    border: 2px dashed var(--glass-border);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.custom-file-label:hover {
+    background: rgba(74, 108, 247, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.custom-file-label i {
+    font-size: 1.2rem;
 }
