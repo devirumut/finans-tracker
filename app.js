@@ -128,13 +128,22 @@ function setDefaultDate() {
     if (dateEl) dateEl.value = dateString; if (monthFilterEl && !monthFilterEl.value) monthFilterEl.value = monthString;
 }
 
+/* ========================================= */
+/* 🚨 BİLDİRİM MOTORU KURTARMA YAMASI 🚨 */
+/* ========================================= */
+
 let notifyTimeout;
 function showNotify(message, icon = 'fa-circle-check') {
-    if (!notification) return;
-    notification.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`; 
-    notification.classList.add('show');
+    // Kutuyu site ilk açıldığında değil, bildirim gerektiği an arayıp buluyoruz!
+    const bildirimKutusu = document.getElementById('notification');
+    
+    if (!bildirimKutusu) return;
+    
+    bildirimKutusu.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`; 
+    bildirimKutusu.classList.add('show');
+    
     clearTimeout(notifyTimeout); 
-    notifyTimeout = setTimeout(() => notification.classList.remove('show'), 3000);
+    notifyTimeout = setTimeout(() => bildirimKutusu.classList.remove('show'), 3000);
 }
 
 // ==========================================
