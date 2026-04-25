@@ -451,13 +451,15 @@ function updateChart(currentTransactions) {
     } 
     // 3. GİDER YOĞUNLUĞU (Polar Area / Kutup Grafiği)
     else if (currentChartType === 'polar') {
-        const labels = Object.keys(expenseCats); 
-        const dataValues = Object.values(expenseCats);
-        
-        // Eğer henüz harcama girilmemişse grafik boş kalmasın
+        let labels = Object.keys(expenseCats); 
+        let dataValues = Object.values(expenseCats);
+        let isEmpty = false;
+
+        // Eğer henüz harcama girilmemişse grafik boş kalmasın ama yalan veri de göstermesin
         if (labels.length === 0) {
-            labels.push('Henüz Harcama Yok');
-            dataValues.push(1);
+            labels = ['Henüz Harcama Yok'];
+            dataValues = [1]; // Şeklin çizilmesi için matematiksel 1 veriyoruz
+            isEmpty = true;   // Ama sistem bunun boş olduğunu bilecek!
         }
 
         expenseChartInstance = new Chart(ctx, { 
@@ -466,8 +468,10 @@ function updateChart(currentTransactions) {
                 labels: labels, 
                 datasets: [{ 
                     data: dataValues, 
-                    // Saydam (transparan) renkler veriyoruz ki üst üste bindiğinde şık dursun
-                    backgroundColor: [
+                    // Eğer boşsa soluk gri bir daire çiz, doluysa renkli çiz
+                    backgroundColor: isEmpty 
+                        ? ['rgba(148, 163, 184, 0.2)'] 
+                        : [
                         'rgba(239, 68, 68, 0.75)',   // Kırmızı
                         'rgba(249, 115, 22, 0.75)',  // Turuncu
                         'rgba(245, 158, 11, 0.75)',  // Sarı
@@ -477,18 +481,20 @@ function updateChart(currentTransactions) {
                         'rgba(217, 70, 239, 0.75)'   // Pembe
                     ],
                     borderWidth: 2,
-                    borderColor: '#ffffff' // Dilimlerin arasını beyaz kesiklerle ayırır
+                    borderColor: '#ffffff'
                 }] 
             }, 
             options: { 
                 responsive: true, 
                 maintainAspectRatio: false, 
-                animation: { duration: 700, easing: 'easeOutBounce' }, // Açılırken hafif zıplama efekti
+                animation: { duration: 700, easing: 'easeOutBounce' },
                 plugins: { 
-                    legend: { display: false }, // Karmaşayı önlemek için yazıları gizliyoruz
+                    legend: { display: false },
                     tooltip: { 
                         callbacks: { 
                             label: function(context) { 
+                                // Boşken 1 TL yazmasın, bilgi versin!
+                                if (isEmpty) return " Harcama eklediğinizde şekillenecektir.";
                                 return ` ${currentCurrency}${context.raw.toFixed(2)}`; 
                             } 
                         } 
@@ -496,8 +502,8 @@ function updateChart(currentTransactions) {
                 },
                 scales: {
                     r: {
-                        ticks: { display: false }, // Merkezdeki sayıları gizler
-                        grid: { color: 'rgba(0,0,0,0.08)' } // Arka plandaki radar çizgilerini hafifletir
+                        ticks: { display: false },
+                        grid: { color: 'rgba(0,0,0,0.08)' }
                     }
                 }
             } 
