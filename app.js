@@ -380,6 +380,7 @@ function getAutoSalary() {
     return salaryTrans.length > 0 ? salaryTrans[salaryTrans.length - 1].amount : 0;
 }
 
+// YENİ PROJEEE/app.js
 function getTimeCostString(amount) {
     const salary = getAutoSalary();
     if (salary <= 0 || userWorkHours <= 0) return null;
@@ -387,11 +388,19 @@ function getTimeCostString(amount) {
     const hourlyWage = salary / userWorkHours;
     const totalHours = Math.abs(amount) / hourlyWage;
     
-    if (totalHours < 1) return `${Math.round(totalHours * 60)} dk`;
-    if (totalHours < 8) return `${totalHours.toFixed(1)} saat`;
-    const days = Math.floor(totalHours / 8);
-    const rem = (totalHours % 8).toFixed(1);
-    return rem > 0 ? `${days}g ${rem}s` : `${days} gün`;
+    // Toplam süreyi dakikaya çevirip parçalara ayırıyoruz (9 saat = 540 dakika)
+    const totalMinutes = Math.round(totalHours * 60);
+    const days = Math.floor(totalMinutes / 540); 
+    const remainingMinutes = totalMinutes % 540;
+    const hours = Math.floor(remainingMinutes / 60);
+    const mins = remainingMinutes % 60;
+
+    let parts = [];
+    if (days > 0) parts.push(`${days}g`);
+    if (hours > 0) parts.push(`${hours}s`);
+    if (mins > 0) parts.push(`${mins}dk`);
+    
+    return parts.join(' ') || "0dk";
 }
 
 // ==========================================
@@ -1501,50 +1510,46 @@ if (amountEl) amountEl.addEventListener('input', calculateTimeCost);
 if (typeExpense) typeExpense.addEventListener('change', calculateTimeCost);
 if (typeIncome) typeIncome.addEventListener('change', calculateTimeCost);
 
+// YENİ PROJEEE/app.js
 function calculateTimeCost() {
     if (!timeCostDisplay || !timeCostValue) return;
     
     const amount = parseFloat(amountEl.value) || 0;
     const isExpense = typeExpense && typeExpense.checked; 
 
-    // Ekranda bir şey yoksa veya gelir seçiliyse gizle
     if (amount <= 0 || !isExpense || userWorkHours <= 0) {
         timeCostDisplay.style.display = 'none';
         return;
     }
 
-    // 🤖 AKILLI MAAŞ BULUCU: "Maaş" kelimesi geçen son geliri bulur
     let autoSalary = 0;
     const salaryTransactions = transactions.filter(t => t.amount > 0 && t.category && t.category.toLowerCase().includes('maaş'));
     
     if (salaryTransactions.length > 0) {
-        // En son eklenen maaşı al
         autoSalary = salaryTransactions[salaryTransactions.length - 1].amount;
     }
 
-    // Eğer sistemde hiç maaş kaydı yoksa uyarı verme
     if (autoSalary <= 0) {
         timeCostDisplay.style.display = 'none';
         return;
     }
 
-    // Hesaplama (Saatlik Ücret = Otomatik Bulunan Maaş / Çalışma Saati)
     const hourlyWage = autoSalary / userWorkHours;
-    const totalHoursNeeded = amount / hourlyWage;
+    const totalHours = amount / hourlyWage;
 
-    let timeString = "";
-    if (totalHoursNeeded < 1) {
-        const mins = Math.round(totalHoursNeeded * 60);
-        timeString = `${mins} dk`;
-    } else if (totalHoursNeeded < 8) { 
-        timeString = `${totalHoursNeeded.toFixed(1)} saat`;
-    } else {
-        const days = Math.floor(totalHoursNeeded / 8);
-        const remainingHours = (totalHoursNeeded % 8).toFixed(1);
-        timeString = remainingHours > 0 ? `${days} gün ${remainingHours} saat` : `${days} gün`;
-    }
+    // Aynı hassas dakika parçalama işlemi
+    const totalMinutes = Math.round(totalHours * 60);
+    const days = Math.floor(totalMinutes / 540); // 9 saat = 540 dakika
+    const remainingMinutes = totalMinutes % 540;
+    const hours = Math.floor(remainingMinutes / 60);
+    const mins = remainingMinutes % 60;
 
-    timeCostValue.innerText = timeString;
+    let parts = [];
+    if (days > 0) parts.push(`${days}g`);
+    if (hours > 0) parts.push(`${hours}s`);
+    if (mins > 0) parts.push(`${mins}dk`);
+
+    timeCostValue.innerText = parts.join(' ') || "0dk";
     timeCostDisplay.style.display = 'block';
 }
 
