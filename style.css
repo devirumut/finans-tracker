@@ -2506,3 +2506,87 @@ body.dark-mode .chart-btn.active {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+/* ========================================= */
+/* 📱 MOBİL KART GÖRÜNÜMÜ KESİN YAMASI 📱 */
+/* ========================================= */
+@media (max-width: 850px) {
+    .transaction-list {
+        padding-right: 0 !important;
+    }
+    
+    .transaction-item { 
+        flex-direction: column !important; 
+        align-items: flex-start !important; 
+        gap: 12px !important; 
+        padding: 16px !important; 
+        margin-bottom: 12px !important; 
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 15px !important; 
+        background: rgba(255, 255, 255, 0.4) !important; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important;
+    }
+    
+    body.dark-mode .transaction-item {
+        background: rgba(15, 23, 42, 0.4) !important;
+    }
+    
+    .transaction-info { 
+        width: 100% !important; 
+        display: flex !important; 
+        flex-direction: column !important; 
+        align-items: flex-start !important; 
+        gap: 6px !important;
+    }
+
+    .transaction-info > span:first-child {
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        gap: 6px !important;
+        line-height: 1.4 !important;
+    }
+    
+    .transaction-info small {
+        margin-top: 4px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .transaction-item > div:nth-child(2) { 
+        width: 100% !important; 
+        justify-content: space-between !important; 
+        padding-top: 12px !important; 
+        border-top: 1px dashed rgba(0,0,0,0.1) !important; 
+    }
+    
+    body.dark-mode .transaction-item > div:nth-child(2) { 
+        border-top-color: rgba(255,255,255,0.1) !important; 
+    }
+}
+
+/* ========================================= */
+/* 📱 MOBİL KART ÇİZGİLERİNİ BELİRGİNLEŞTİRME 📱 */
+/* ========================================= */
+@media (max-width: 850px) {
+    /* 1. Kart içindeki alt ve üst bölümü ayıran çizgiyi netleştiriyoruz */
+    .transaction-item > div:nth-child(2) {
+        border-top: 1px solid rgba(0, 0, 0, 0.25) !important; /* Kesik çizgi yerine net ve düz çizgi */
+    }
+    body.dark-mode .transaction-item > div:nth-child(2) {
+        border-top-color: rgba(255, 255, 255, 0.25) !important;
+    }
+    
+    /* 2. Kartların kendi dış çerçevesini daha belirgin yapıyoruz */
+    .transaction-item {
+        border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    }
+    body.dark-mode .transaction-item {
+        border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+}
+
+/* ========================================= */
+/* 🐛 ZAMAN=PARA ROZETİ GÖRÜNÜRLÜK YAMASI 🐛 */
+/* ========================================= */
+.transaction-info span.time-cost-badge {
+    display: none; /* Genel kuralların rozeti zorla açmasını engeller */
+}
