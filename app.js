@@ -626,11 +626,30 @@ function updateChart(currentTransactions) {
     }
 }
 
+// YENİ PROJEEE/app.js - Akıllı Arama Entegreli init()
 function init() {
     if(listEl) listEl.innerHTML = '';
     const selectedMonth = monthFilterEl ? monthFilterEl.value : ''; 
-    const filteredTransactions = transactions.filter(t => { return !selectedMonth || t.date.startsWith(selectedMonth); });
-    filteredTransactions.forEach(addTransactionDOM); updateValues(filteredTransactions); updateChart(filteredTransactions);
+    const searchTerm = searchEl ? searchEl.value.toLowerCase().trim() : '';
+
+    let filteredTransactions = transactions;
+
+    if (searchTerm !== "") {
+        // 🔍 Arama yapılıyorsa ay filtresini yoksay, tüm yılları tara!
+        filteredTransactions = transactions.filter(t => 
+            t.text.toLowerCase().includes(searchTerm) || 
+            (t.category && t.category.toLowerCase().includes(searchTerm))
+        );
+    } else {
+        // 📅 Arama yoksa normal bir şekilde sadece seçili ayın verilerini getir
+        filteredTransactions = transactions.filter(t => { 
+            return !selectedMonth || t.date.startsWith(selectedMonth); 
+        });
+    }
+
+    filteredTransactions.forEach(addTransactionDOM); 
+    updateValues(filteredTransactions); 
+    updateChart(filteredTransactions);
 }
 
 function changeMonth(offset) {
@@ -644,12 +663,9 @@ if(monthFilterEl) monthFilterEl.addEventListener('change', init);
 if(prevMonthBtn) prevMonthBtn.addEventListener('click', () => changeMonth(-1));
 if(nextMonthBtn) nextMonthBtn.addEventListener('click', () => changeMonth(1));
 
+// Mevcut Arama çubuğuna her harf girildiğinde tüm sistemi canlı güncelle
 if(searchEl) {
-    searchEl.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase().trim(); const selectedMonth = monthFilterEl ? monthFilterEl.value : ''; 
-        const filteredTransactions = transactions.filter(t => { const isMonthMatch = !selectedMonth || t.date.startsWith(selectedMonth); const isTextMatch = t.text.toLowerCase().includes(searchTerm) || (t.category && t.category.toLowerCase().includes(searchTerm)); return isMonthMatch && isTextMatch; });
-        if(listEl) listEl.innerHTML = ''; filteredTransactions.forEach(addTransactionDOM);
-    });
+    searchEl.addEventListener('input', init);
 }
 
 function updateIncomeExpenseUI(totalIncome, totalExpense) {
