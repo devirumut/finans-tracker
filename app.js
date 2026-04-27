@@ -49,6 +49,12 @@ const yearlyView = document.getElementById('yearly-view');
 const notesView = document.getElementById('notes-view');
 const settingsView = document.getElementById('settings-view');
 
+const menuTrends = document.getElementById('menu-trends');
+const trendsView = document.getElementById('trends-view');
+const trendSelect = document.getElementById('trend-item-select');
+const trendCtx = document.getElementById('trendChart');
+let trendChartInstance = null;
+
 const subForm = document.getElementById('subscription-form');
 const subListEl = document.getElementById('subscription-list');
 const tickerEl = document.getElementById('ticker-content');
@@ -224,20 +230,20 @@ if (hamburgerBtn && sidebar && mobileOverlay) {
 
 // switchMenu fonksiyonu içine documents ekle
 function switchMenu(activeMenuBtn, activeViewDiv) {
-    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuDocuments, menuSettings].forEach(btn => { if(btn) btn.classList.remove('active'); });
-    [dashboardView, calendarView, yearlyView, notesView, documentsView, settingsView].forEach(view => { if(view) view.style.display = 'none'; });
+    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuDocuments, menuSettings, menuTrends].forEach(btn => { if(btn) btn.classList.remove('active'); });
+    [dashboardView, calendarView, yearlyView, notesView, documentsView, settingsView, trendsView].forEach(view => { if(view) view.style.display = 'none'; });
     if(activeMenuBtn) activeMenuBtn.classList.add('active');
     if(activeViewDiv) activeViewDiv.style.display = 'flex';
 
     if (window.innerWidth <= 850 && sidebar && mobileOverlay) {
-        sidebar.classList.remove('mobile-open');
-        mobileOverlay.classList.remove('active');
+        sidebar.classList.remove('mobile-open'); mobileOverlay.classList.remove('active');
     }
 }
 
 if(menuDashboard) menuDashboard.onclick = (e) => { e.preventDefault(); switchMenu(menuDashboard, dashboardView); };
 if(menuCalendar) menuCalendar.onclick = (e) => { e.preventDefault(); switchMenu(menuCalendar, calendarView); renderCalendar(); };
 if(menuYearly) menuYearly.onclick = (e) => { e.preventDefault(); switchMenu(menuYearly, yearlyView); initYearlyStatus(); };
+if(menuTrends) menuTrends.onclick = (e) => { e.preventDefault(); switchMenu(menuTrends, trendsView); initTrendOptions(); };
 if(menuNotes) menuNotes.onclick = (e) => { e.preventDefault(); switchMenu(menuNotes, notesView); initNotes(); };
 if(menuDocuments) menuDocuments.onclick = (e) => { e.preventDefault(); switchMenu(menuDocuments, documentsView); initDocuments(); };
 if(menuSettings) menuSettings.onclick = (e) => { e.preventDefault(); switchMenu(menuSettings, settingsView); };
@@ -1167,16 +1173,22 @@ initNotes();
 renderCalendar();
 
 // ==========================================
-// 17. PWA (MOBİL UYGULAMA) MOTORU KAYDI
+// 17. PWA MOTORU (OTOMATİK GÜNCELLEMELİ)
 // ==========================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
+        // Tarayıcıyı kandırmak için URL'nin sonuna o anın "milisaniyesini" ekliyoruz.
+        // Böylece tarayıcı her girişte "Aaa yeni dosya gelmiş" sanıp günceli çeker.
+        const swUrl = './sw.js?t=' + new Date().getTime(); 
+        
+        navigator.serviceWorker.register(swUrl)
             .then(registration => {
-                console.log('ServiceWorker başarıyla kaydedildi!');
+                console.log('SW (Oto-Güncel) devrede!');
+                // Arka planda takılı kalmış eski sürümleri zorla günceller
+                registration.update();
             })
             .catch(err => {
-                console.log('ServiceWorker kaydı başarısız oldu: ', err);
+                console.log('SW Kayıt Hatası: ', err);
             });
     });
 }
@@ -1563,5 +1575,124 @@ if(formEl) {
 if(formEl) {
     formEl.addEventListener('reset', () => {
         if(timeCostDisplay) timeCostDisplay.style.display = 'none';
+    });
+}
+// ==========================================
+// 📈 HARCAMA TRENDLERİ (ULTRA PREMIUM DROPDOWN)
+// ==========================================
+const customDropdown = document.getElementById('trend-custom-dropdown');
+const dropdownSelected = document.getElementById('trend-dropdown-selected');
+const selectedText = document.getElementById('trend-selected-text');
+const dropdownOptions = document.getElementById('trend-dropdown-options');
+
+// Menüyü Aç/Kapat
+if (dropdownSelected) {
+    dropdownSelected.addEventListener('click', () => {
+        customDropdown.classList.toggle('active');
+    });
+}
+
+// Menü Dışına Tıklanınca Kapansın
+document.addEventListener('click', (e) => {
+    if (customDropdown && !customDropdown.contains(e.target)) {
+        customDropdown.classList.remove('active');
+    }
+});
+
+function initTrendOptions() {
+    if(!dropdownOptions) return;
+    const expenses = transactions.filter(t => t.amount < 0);
+    const nameCounts = {};
+    
+    expenses.forEach(t => {
+        const name = t.text.trim().toLowerCase();
+        nameCounts[name] = (nameCounts[name] || 0) + 1;
+    });
+
+    const trendNames = Object.keys(nameCounts).filter(name => nameCounts[name] > 1);
+    dropdownOptions.innerHTML = ''; // İçini temizle
+
+    if (trendNames.length === 0) {
+        selectedText.innerText = 'Tekrarlayan harcama yok';
+        if(trendChartInstance) trendChartInstance.destroy();
+        return;
+    }
+
+    const originalNames = {};
+    expenses.forEach(t => {
+        const name = t.text.trim().toLowerCase();
+        if(trendNames.includes(name) && !originalNames[name]) originalNames[name] = t.text.trim();
+    });
+
+    // Listeye Elemanları Şık Bir Şekilde Ekle
+    trendNames.forEach(name => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.innerText = originalNames[name];
+        
+        // Tıklama Olayı (Seçimi yap, menüyü kapat, grafiği çiz)
+        item.addEventListener('click', () => {
+            selectedText.innerText = originalNames[name]; // Başlığı değiştir
+            customDropdown.classList.remove('active'); // Menüyü kapat
+            renderTrendChart(name); // Grafiği çizdir
+        });
+        
+        dropdownOptions.appendChild(item);
+    });
+}
+
+function renderTrendChart(selectedNameLowerCase) {
+    if(!trendCtx || !selectedNameLowerCase) return;
+
+    const expenses = transactions.filter(t => t.amount < 0 && t.text.trim().toLowerCase() === selectedNameLowerCase);
+    expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const monthlyData = {};
+    expenses.forEach(t => {
+        const monthStr = t.date.substring(0, 7); 
+        monthlyData[monthStr] = (monthlyData[monthStr] || 0) + Math.abs(t.amount);
+    });
+
+    const labels = Object.keys(monthlyData).sort();
+    const data = labels.map(l => monthlyData[l]);
+    
+    const displayLabels = labels.map(l => {
+        const [year, month] = l.split('-');
+        const monthNamesTR = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
+        return `${monthNamesTR[parseInt(month)-1]} ${year}`;
+    });
+
+    if(trendChartInstance) trendChartInstance.destroy();
+
+    trendChartInstance = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: displayLabels,
+            datasets: [{
+                label: 'Aylık Ödenen Tutar',
+                data: data,
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                borderWidth: 3,
+                pointBackgroundColor: '#ea580c',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                fill: true,
+                tension: 0.3 
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => ` ${currentCurrency}${ctx.raw.toFixed(2)}` } }
+            },
+            scales: {
+                y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
     });
 }

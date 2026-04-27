@@ -1,4 +1,7 @@
-const CACHE_NAME = 'finans-tracker-v3.3 Stable';
+// SÜREKLİ GÜNCEL KALAN DİNAMİK CACHE (Artık manuel versiyon yazmaya SON!)
+// İsmini o anın saatine göre milisaniye cinsinden kendi belirler.
+const CACHE_NAME = 'finans-tracker-auto-' + new Date().getTime();
+
 const urlsToCache = [
     './',
     './index.html',
@@ -6,15 +9,15 @@ const urlsToCache = [
     './app.js'
 ];
 
-// 1. Kurulum Aşaması
+// 1. Kurulum: Beklemeyi reddet, anında yüklen
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
     );
-    self.skipWaiting();
+    self.skipWaiting(); 
 });
 
-// 2. Aktifleşme ve Temizlik (ESKİ İNATÇI HAFIZALARI SİLER)
+// 2. Aktifleşme: Eski inatçı hafızaları acımadan sil
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
@@ -27,10 +30,10 @@ self.addEventListener('activate', event => {
             );
         })
     );
-    self.clients.claim();
+    self.clients.claim(); // Sayfanın kontrolünü anında ele geçir
 });
 
-// 3. Ağ İstekleri (NETWORK FIRST: Önce internet, yoksa hafıza)
+// 3. Ağ İstekleri: Önce internetten tazesini çek, internet yoksa (çevrimdışıysa) önbelleği kullan
 self.addEventListener('fetch', event => {
     event.respondWith(
         fetch(event.request).catch(() => caches.match(event.request))

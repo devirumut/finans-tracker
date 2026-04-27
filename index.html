@@ -44,6 +44,7 @@
                 <a href="#" id="menu-dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> Özet</a>
                 <a href="#" id="menu-calendar"><i class="fa-regular fa-calendar"></i> Takvim</a>
                 <a href="#" id="menu-yearly"><i class="fa-solid fa-calendar-days"></i> Yıllık Durum</a>
+                <a href="#" id="menu-trends"><i class="fa-solid fa-chart-area"></i> Trendler</a>
                 <a href="#" id="menu-notes"><i class="fa-solid fa-note-sticky"></i> Notlarım</a>
                 <a href="#" id="menu-documents"><i class="fa-solid fa-file-invoice"></i> Belgeler</a>
                 <a href="#" id="menu-settings"><i class="fa-solid fa-gear"></i> Ayarlar</a>
@@ -256,6 +257,32 @@
                         <tfoot id="yearly-status-foot">
                         </tfoot>
                     </table>
+                </div>
+            </div>
+
+            <div id="trends-view" style="display: none; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
+                <header class="header-section" style="margin-bottom: 20px;">
+                    <div>
+                        <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Harcama Trendleri 📈</h1>
+                        <p class="text-muted">Aynı isimdeki harcamalarınızın (fatura, abonelik vb.) zaman içindeki fiyat değişimini izleyin.</p>
+                    </div>
+                </header>
+                <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 25px;">
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; position: relative; z-index: 50;">
+                        <label style="font-weight: 600; color: var(--text-main);"><i class="fa-solid fa-magnifying-glass-chart" style="color: var(--primary-color);"></i> İzlenecek Harcama:</label>
+                        
+                        <div class="custom-dropdown" id="trend-custom-dropdown">
+                            <div class="dropdown-selected" id="trend-dropdown-selected">
+                                <span id="trend-selected-text">Harcama Seçin</span>
+                                <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                            </div>
+                            <div class="dropdown-options" id="trend-dropdown-options">
+                                </div>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="flex: 1; min-height: 300px; position: relative;">
+                        <canvas id="trendChart"></canvas>
+                    </div>
                 </div>
             </div>
 
