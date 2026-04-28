@@ -16,7 +16,7 @@
         <div id="mobile-header">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <i class="fa-solid fa-wallet" style="color: var(--primary-color); font-size: 1.5rem;"></i>
-                <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-main);">Finans Asistanı V3.4</h2>
+                <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-main);">Finans Asistanı V3.5</h2>
             </div>
             <button id="hamburger-btn"><i class="fa-solid fa-bars-staggered"></i></button>
         </div>
@@ -149,18 +149,35 @@
 
                 <div class="bottom-split-area">
                     <div class="card history-card">
-                        <div class="history-header">
-                            <div class="search-container" style="flex: 1; margin-bottom: 0;">
+                        <div class="history-header" style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+    
+                            <div class="search-container" style="flex: 2; min-width: 180px; height: 40px; margin-bottom: 0; position: relative;">
                                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                                <input type="text" id="search" class="search-input" placeholder="İşlem ara...">
+                                <input type="text" id="search" class="search-input" placeholder="İşlem ara..." style="padding: 0 40px 0 40px !important; height: 40px !important; width: 100%; font-size: 0.85rem;">
+                                <i class="fa-solid fa-circle-xmark" id="clear-search-btn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 1.1rem; z-index: 5;"></i>
                             </div>
-                            <div class="month-filter-container">
-                                <button id="prev-month-btn" class="list-btn" title="Önceki Ay"><i class="fa-solid fa-chevron-left"></i></button>
-                                <div style="display:flex; align-items:center; gap:8px; padding: 0 5px;">
-                                    <i class="fa-regular fa-calendar-days" style="color: var(--text-muted);"></i>
-                                    <input type="month" id="month-filter" title="Dönem Seç">
+                        
+                            <div class="custom-dropdown" id="sort-custom-dropdown" style="width: 150px; height: 40px; z-index: 100;">
+                                <div class="dropdown-selected" id="sort-dropdown-selected" style="height: 40px; padding: 0 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="display:flex; align-items:center; gap:6px; font-weight: 600; color: var(--text-main); font-size: 0.8rem;">
+                                        <i class="fa-solid fa-arrow-down-wide-short" style="color: var(--primary-color); font-size: 0.85rem;"></i>
+                                        <span id="sort-selected-text">Tarih (En Yeni)</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down dropdown-arrow" style="color: var(--primary-color); font-size: 0.75rem;"></i>
                                 </div>
-                                <button id="next-month-btn" class="list-btn" title="Sonraki Ay"><i class="fa-solid fa-chevron-right"></i></button>
+                                <div class="dropdown-options" id="sort-dropdown-options" style="z-index: 101;">
+                                    <div class="dropdown-item" data-value="date-desc" style="padding: 10px 12px; font-size: 0.8rem;">Tarih (En Yeni)</div>
+                                    <div class="dropdown-item" data-value="date-asc" style="padding: 10px 12px; font-size: 0.8rem;">Tarih (En Eski)</div>
+                                    <div class="dropdown-item" data-value="amount-desc" style="padding: 10px 12px; font-size: 0.8rem;">Tutar (En Yüksek)</div>
+                                    <div class="dropdown-item" data-value="amount-asc" style="padding: 10px 12px; font-size: 0.8rem;">Tutar (En Düşük)</div>
+                                </div>
+                                <input type="hidden" id="sort-filter" value="date-desc">
+                            </div>
+                        
+                            <div class="month-filter-container" style="display: flex; height: 40px; align-items: center; padding: 0 5px !important; border-radius: 10px; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border);">
+                                <button id="prev-month-btn" class="list-btn" style="height: 30px; width: 30px; min-width: 30px;" title="Önceki Ay"><i class="fa-solid fa-chevron-left" style="font-size: 0.8rem;"></i></button>
+                                <input type="month" id="month-filter" style="height: 100%; border: none; background: transparent; outline: none; font-weight: 600; font-size: 0.85rem; padding: 0 5px; color: var(--text-main); cursor: pointer;">
+                                <button id="next-month-btn" class="list-btn" style="height: 30px; width: 30px; min-width: 30px;" title="Sonraki Ay"><i class="fa-solid fa-chevron-right" style="font-size: 0.8rem;"></i></button>
                             </div>
                         </div>
                         <ul id="transaction-list" class="transaction-list"></ul>

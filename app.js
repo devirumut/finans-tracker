@@ -424,7 +424,7 @@ window.togglePaymentStatus = function(id) {
     const transaction = transactions.find(t => t.id === id);
     if (transaction) {
         transaction.isPaid = !transaction.isPaid; localStorage.setItem('transactions', JSON.stringify(transactions)); init();
-        if(transaction.isPaid) showNotify("Harcama 'Ödendi' yapıldı!", "fa-check-circle"); else showNotify("Harcama 'Ödenmedi' durumuna alındı!", "fa-clock");
+        if(transaction.isPaid) showNotify("Harcama 'Ödendi'!", "fa-check-circle"); else showNotify("Harcama 'Ödenmedi' durumuna alındı!", "fa-clock");
         if(accessToken) backupToDrive(true);
     }
 };
@@ -626,16 +626,17 @@ function updateChart(currentTransactions) {
     }
 }
 
-// YENİ PROJEEE/app.js - Akıllı Arama Entegreli init()
+// YENİ PROJEEE/app.js - Akıllı Arama ve Sıralama Entegreli init()
 function init() {
     if(listEl) listEl.innerHTML = '';
     const selectedMonth = monthFilterEl ? monthFilterEl.value : ''; 
     const searchTerm = searchEl ? searchEl.value.toLowerCase().trim() : '';
+    const sortVal = document.getElementById('sort-filter') ? document.getElementById('sort-filter').value : 'date-desc';
 
     let filteredTransactions = transactions;
 
     if (searchTerm !== "") {
-        // 🔍 Arama yapılıyorsa ay filtresini yoksay, tüm yılları tara!
+        // 🔍 Arama yapılıyorsa ay filtresini yoksay, tüm yılları tara
         filteredTransactions = transactions.filter(t => 
             t.text.toLowerCase().includes(searchTerm) || 
             (t.category && t.category.toLowerCase().includes(searchTerm))
@@ -646,6 +647,19 @@ function init() {
             return !selectedMonth || t.date.startsWith(selectedMonth); 
         });
     }
+
+    // 📉 YENİ: SIRALAMA MOTORU DEVREDE
+    filteredTransactions.sort((a, b) => {
+        if (sortVal === 'date-desc') {
+            return new Date(b.date) - new Date(a.date) || b.id - a.id; // En Yeni (Varsayılan)
+        } else if (sortVal === 'date-asc') {
+            return new Date(a.date) - new Date(b.date) || a.id - b.id; // En Eski
+        } else if (sortVal === 'amount-desc') {
+            return Math.abs(b.amount) - Math.abs(a.amount); // Tutar: En Yüksek
+        } else if (sortVal === 'amount-asc') {
+            return Math.abs(a.amount) - Math.abs(b.amount); // Tutar: En Düşük
+        }
+    });
 
     filteredTransactions.forEach(addTransactionDOM); 
     updateValues(filteredTransactions); 
@@ -667,6 +681,70 @@ if(nextMonthBtn) nextMonthBtn.addEventListener('click', () => changeMonth(1));
 if(searchEl) {
     searchEl.addEventListener('input', init);
 }
+
+// ==========================================
+// 🔍 ARAMA ÇUBUĞU TEMİZLEME (ÇARPI) BUTONU
+// ==========================================
+const searchInputEl = document.getElementById('search');
+const clearSearchBtn = document.getElementById('clear-search-btn');
+
+if (searchInputEl && clearSearchBtn) {
+    // 1. Yazı yazıldıkça çarpıyı göster veya gizle
+    searchInputEl.addEventListener('input', () => {
+        if (searchInputEl.value.trim().length > 0) {
+            clearSearchBtn.style.display = 'block';
+        } else {
+            clearSearchBtn.style.display = 'none';
+        }
+    });
+
+    // 2. Çarpıya basılınca yazıyı sil, çarpıyı gizle ve listeyi orijinal haline döndür
+    clearSearchBtn.addEventListener('click', () => {
+        searchInputEl.value = ''; // Kutuyu boşalt
+        clearSearchBtn.style.display = 'none'; // Çarpıyı gizle
+        init(); // Tabloyu, grafikleri ve kartları sıfırla (Eski haline döndür)
+    });
+}
+
+// ==========================================
+// 📉 PREMIUM SIRALAMA KUTUSU (CUSTOM DROPDOWN) ZEKÂSI
+// ==========================================
+const sortCustomDropdown = document.getElementById('sort-custom-dropdown');
+const sortDropdownSelected = document.getElementById('sort-dropdown-selected');
+const sortSelectedText = document.getElementById('sort-selected-text');
+const sortHiddenInput = document.getElementById('sort-filter');
+const sortOptions = document.querySelectorAll('#sort-dropdown-options .dropdown-item');
+
+if (sortDropdownSelected) {
+    // Kutuya tıklayınca menüyü aç/kapat
+    sortDropdownSelected.addEventListener('click', (e) => {
+        e.stopPropagation(); // Sayfa geneli tıklamayı engelle
+        sortCustomDropdown.classList.toggle('active');
+    });
+}
+
+if (sortOptions.length > 0) {
+    sortOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Seçilen yazıyı ve gizli değeri güncelle
+            sortSelectedText.innerText = option.innerText;
+            sortHiddenInput.value = option.getAttribute('data-value');
+            
+            // Menüyü pürüzsüzce kapat
+            sortCustomDropdown.classList.remove('active');
+            
+            // Sıralamayı uygula (Listeyi yenile)
+            init();
+        });
+    });
+}
+
+// Boşluğa tıklayınca sıralama menüsü kendiliğinden kapansın
+document.addEventListener('click', (e) => {
+    if (sortCustomDropdown && !sortCustomDropdown.contains(e.target)) {
+        sortCustomDropdown.classList.remove('active');
+    }
+});
 
 function updateIncomeExpenseUI(totalIncome, totalExpense) {
     const trackerCard = document.getElementById('income-expense-tracker-card');
