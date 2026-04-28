@@ -39,3 +39,25 @@ self.addEventListener('fetch', event => {
         fetch(event.request).catch(() => caches.match(event.request))
     );
 });
+
+// ==========================================
+// 🔔 BİLDİRİM TIKLANMA OLAYI (APP'İ ÖNE GETİR)
+// ==========================================
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close(); // Tıklayınca bildirimi sistemden sil
+    
+    // Uygulama açıksa o sekmeye odaklan, kapalıysa yeni sekmede uygulamayı aç
+    event.waitUntil(
+        clients.matchAll({ type: 'window' }).then(function(clientList) {
+            for (var i = 0; i < clientList.length; i++) {
+                var client = clientList[i];
+                if (client.url.includes('/') && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow('./');
+            }
+        })
+    );
+});

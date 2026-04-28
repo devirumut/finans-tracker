@@ -10,6 +10,7 @@ let driveFileId = null;
 let editingId = null; 
 let editingCategoryId = null;
 let expenseChartInstance = null; 
+let notificationDays = parseInt(localStorage.getItem('notificationDays')) || 3;
 
 // ==========================================
 // 2. DOM ELEMENTLERİ
@@ -970,6 +971,7 @@ if(subForm) {
     };
 }
 
+// YENİ PROJEEE/app.js - Güncellenmiş ve Bug'dan Arındırılmış Motor
 function checkUpcomingPayments() {
     const container = document.getElementById('payment-reminders-container');
     if(!container) return;
@@ -979,6 +981,7 @@ function checkUpcomingPayments() {
     const today = new Date();
     const currentDay = today.getDate();
     const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    const todayStr = today.toISOString().split('T')[0];
 
     let remindersHTML = '';
     let hasReminders = false;
@@ -988,14 +991,37 @@ function checkUpcomingPayments() {
         let targetDay = sub.day > daysInMonth ? daysInMonth : sub.day;
         let diff = targetDay - currentDay;
 
-        if (diff >= 0 && diff <= 3) {
+        if (diff >= 0 && diff <= notificationDays) { 
             hasReminders = true;
+            // DÜZELTİLEN SATIR BURASI: timeText değişkenini geri ekledik
             let timeText = diff === 0 ? "Bugün!" : `${diff} gün sonra`;
+            
+            // 1. Ekran İçi Uyarıyı Oluştur
             remindersHTML += `
                 <div class="reminder-alert">
                     <i class="fa-solid fa-bell-concierge fa-shake"></i>
                     <span><strong>${sub.name}</strong> ödemesi yaklaştı <strong>(${timeText})</strong></span>
                 </div>`;
+                
+            // 2. CİHAZA YEREL BİLDİRİM (PUSH) GÖNDER
+            if ("Notification" in window && Notification.permission === "granted") {
+                const notifKey = `notified_${sub.id}_${todayStr}`;
+                
+                if (!localStorage.getItem(notifKey)) {
+                    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+                        navigator.serviceWorker.ready.then(reg => {
+                            reg.showNotification('Fatura Hatırlatıcı 🔔', {
+                                body: `${sub.name} ödemeniz yaklaştı (${timeText}). Bütçenizi kontrol edin!`,
+                                icon: 'icon-192.png',
+                                badge: 'icon-192.png',
+                                vibrate: [200, 100, 200, 100, 200],
+                                tag: 'bill-reminder'
+                            });
+                        });
+                    }
+                    localStorage.setItem(notifKey, 'true');
+                }
+            }
         }
     });
 
@@ -1789,4 +1815,69 @@ function renderTrendChart(selectedNameLowerCase) {
             }
         }
     });
+}
+
+// ==========================================
+// 🔔 NATIVE (YEREL) BİLDİRİM İZNİ SİSTEMİ
+// ==========================================
+const enableNotifBtn = document.getElementById('enable-notifications-btn');
+if (enableNotifBtn) {
+    // Sayfa açıldığında zaten izin verildiyse butonu pasif ve yeşil yap
+    if (("Notification" in window) && Notification.permission === 'granted') {
+        enableNotifBtn.innerText = "Bildirimler Aktif";
+        enableNotifBtn.style.opacity = "0.7";
+        enableNotifBtn.disabled = true;
+    }
+
+    enableNotifBtn.addEventListener('click', async () => {
+        if (!("Notification" in window)) {
+            showNotify("Tarayıcınız bildirimleri desteklemiyor.", "fa-triangle-exclamation");
+            return;
+        }
+        
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+            enableNotifBtn.innerText = "Bildirimler Aktif";
+            enableNotifBtn.style.opacity = "0.7";
+            enableNotifBtn.disabled = true;
+            showNotify("Cihaz bildirimlerine izin verildi!", "fa-bell");
+            
+            // Hoş geldin bildirimi yolla
+            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification('FinansTracker', {
+                        body: "Artık faturalarınızı kilit ekranından takip edebilirsiniz!",
+                        icon: 'icon-192.png',
+                        vibrate: [100, 50, 100]
+                    });
+                });
+            }
+        } else {
+            showNotify("Bildirim izni reddedildi.", "fa-circle-xmark");
+        }
+    });
+}
+
+// ==========================================
+// 🔔 BİLDİRİM AYARLARI KONTROLÜ
+// ==========================================
+const notifRange = document.getElementById('notif-days-range');
+const notifValue = document.getElementById('notif-days-value');
+const saveNotifBtn = document.getElementById('save-notif-settings-btn');
+
+if(notifRange) {
+    notifRange.value = notificationDays;
+    notifValue.innerText = notificationDays;
+    // Kaydırırken anlık sayıyı güncelle
+    notifRange.oninput = () => notifValue.innerText = notifRange.value;
+}
+
+if(saveNotifBtn) {
+    saveNotifBtn.onclick = () => {
+        notificationDays = parseInt(notifRange.value);
+        localStorage.setItem('notificationDays', notificationDays);
+        showNotify(`${notificationDays} gün kala hatırlatma ayarlandı!`, "fa-check");
+        checkUpcomingPayments(); // Ayar değişince hatırlatıcıyı tekrar çalıştır
+        if(accessToken) backupToDrive(true); // Drive'a yedekle
+    };
 }

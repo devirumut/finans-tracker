@@ -405,6 +405,7 @@
                 <div class="settings-tabs">
                     <button class="settings-tab-btn active" data-tab="tab-subscriptions"><i class="fa-solid fa-bell"></i> Abonelik Yönetimi</button>
                     <button class="settings-tab-btn" data-tab="tab-categories"><i class="fa-solid fa-tags"></i> Kategori Yönetimi</button>
+                    <button class="settings-tab-btn" data-tab="tab-notifications"><i class="fa-solid fa-bell"></i> Bildirim Ayarları</button>
                     <button class="settings-tab-btn" data-tab="tab-general"><i class="fa-solid fa-sliders"></i> Genel Ayarlar</button>
                 </div>
 
@@ -440,7 +441,7 @@
                         <ul id="subscription-list" class="transaction-list"></ul>
                     </div>
                 </div>
-
+                
                 <div id="tab-categories" class="settings-tab-content" style="display: none; flex-direction: column; flex: 1; min-height: 0; gap: 15px;">
                     <section class="transaction-form-section" style="flex-shrink: 0; padding: 20px;">
                         <form id="category-form" class="horizontal-form" style="grid-template-columns: 1fr 1fr 2fr 1fr; align-items: end;">
@@ -467,69 +468,40 @@
                     </div>
                 </div>
 
-                <div id="tab-general" class="settings-tab-content" style="display: none; flex-direction: column; flex: 1; gap: 15px;">
-                    <div class="card" style="flex: 1; padding: 30px; overflow-y: auto;">
-                        <h3 style="margin-bottom: 25px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;"><i class="fa-solid fa-sliders"></i> Uygulama Tercihleri</h3>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 800px;">
-                            <div class="form-group">
-                                <label style="font-weight: 600; color: var(--text-main);"><i class="fa-solid fa-coins" style="color: #f59e0b;"></i> Para Birimi</label>
-                                <div class="circle-selector" id="currency-selector">
-                                    <button class="circle-btn active" data-value="₺" title="Türk Lirası">₺</button>
-                                    <button class="circle-btn" data-value="$" title="Amerikan Doları">$</button>
-                                    <button class="circle-btn" data-value="€" title="Euro">€</button>
-                                    <button class="circle-btn" data-value="£" title="İngiliz Sterlini">£</button>
-                                </div>
-                                <small style="color: var(--text-muted); display: block; margin-top: 12px;">Seçtiğiniz para birimi tüm tablolara ve formlara anında yansır.</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label style="font-weight: 600; color: var(--text-main);"><i class="fa-solid fa-palette" style="color: var(--primary-color);"></i> Vurgu Rengi (Tema)</label>
-                                <div class="circle-selector" id="theme-selector">
-                                    <button class="circle-btn theme-color-btn active" data-value="default" style="background-color: #4a6cf7;" title="Okyanus Mavisi"></button>
-                                    <button class="circle-btn theme-color-btn" data-value="theme-green" style="background-color: #059669;" title="Zümrüt Yeşili"></button>
-                                    <button class="circle-btn theme-color-btn" data-value="theme-purple" style="background-color: #7c3aed;" title="Ametist Moru"></button>
-                                    <button class="circle-btn theme-color-btn" data-value="theme-orange" style="background-color: #ea580c;" title="Ateş Turuncusu"></button>
-                                </div>
-                                <small style="color: var(--text-muted); display: block; margin-top: 12px;">Butonlar, grafikler ve ana renkleriniz bu seçime göre değişir.</small>
-                            </div>
+                <div id="tab-notifications" class="settings-tab-content" style="display: none; flex-direction: column; flex: 1; gap: 15px;">
+                    
+                    <div style="margin-bottom: 5px; padding: 15px 20px; background: rgba(16, 185, 129, 0.05); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h4 style="margin:0; color: var(--success-color); font-size: 1.05rem;"><i class="fa-solid fa-bell-ringing"></i> Cihaz Bildirimleri</h4>
+                            <p style="margin:3px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Yaklaşan faturalarınızı telefonunuzun kilit ekranına bildirim olarak gönderin.</p>
                         </div>
-
-                        <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
-                            <h4 style="color: var(--success-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-file-export"></i> Veri Dışa Aktarma ve Raporlama</h4>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Verilerinizi Excel olarak indirebilir veya görsel bir aylık PDF raporu oluşturabilirsiniz.</p>
-                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                                <button id="export-excel-btn" class="btn-primary" style="padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; background-color: var(--success-color); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
-                                    <i class="fa-solid fa-file-excel"></i> Excel (CSV) İndir
-                                </button>
-                                <button id="download-pdf-btn" class="btn-primary" style="padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; background-color: #e11d48; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: auto; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);">
-                                    <i class="fa-solid fa-file-pdf"></i> PDF Rapor Oluştur
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
-                            <h4 style="color: #f59e0b; margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-hourglass-half"></i> Zaman = Para (Psikolojik Kalkan)</h4>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Aylık ortalama çalışma saatinizi girin. Sistem, maaşınızı "Maaş" olarak eklediğiniz gelirlerden otomatik bulur ve harcamalarınızın ömrünüzden kaç saat götürdüğünü hesaplar.</p>
-                            <div style="display: flex; gap: 20px; margin-bottom: 15px; align-items: flex-end;">
-                                <div class="form-group" style="margin-bottom: 0; width: 200px;">
-                                    <label style="font-size: 0.85rem;">Aylık Çalışma Saati</label>
-                                    <input type="number" id="setting-work-hours" class="form-control" placeholder="Örn: 160" value="160" style="padding: 10px;">
-                                </div>
-                                <button id="save-time-money-btn" class="btn-primary" style="width: auto; padding: 12px 30px; background-color: #f59e0b; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2); border: none;">
-                                    <i class="fa-solid fa-clock-rotate-left"></i> Yapılandırmayı Güncelle
-                                </button>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 800px;">
-                            <h4 style="color: var(--danger-color); margin-bottom: 10px; font-size: 1.1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Tehlikeli Alan</h4>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Uygulamadaki verilerinizi sıfırlamak için aşağıdaki butona tıklayın ve neleri silmek istediğinizi seçin.</p>
-                            <button id="open-reset-modal-btn" class="btn-secondary" style="padding: 12px 20px; border-radius: 10px; color: var(--danger-color); border: 1px solid var(--danger-color); background: rgba(239, 68, 68, 0.05); font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                                <i class="fa-solid fa-skull-crossbones"></i> Verileri Temizle / Sıfırla
-                            </button>
-                        </div>
+                        <button id="enable-notifications-btn" class="btn-primary" style="width: auto; padding: 10px 20px; font-size: 0.9rem; background-color: var(--success-color); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
+                            <i class="fa-solid fa-check"></i> İzin Ver
+                        </button>
                     </div>
+
+                    <div class="card" style="padding: 25px;">
+                        <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-bell-config"></i> Hatırlatıcı Yapılandırması</h3>
+                        
+                        <div class="form-group" style="max-width: 450px; margin-bottom: 30px;">
+                            <label style="font-weight: 600; color: var(--text-main);">Kaç gün önceden haber verilsin?</label>
+                            <div style="display: flex; align-items: center; gap: 20px; margin-top: 15px; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
+                                <input type="range" id="notif-days-range" min="1" max="10" value="3" style="flex: 1; accent-color: var(--primary-color); cursor: pointer;">
+                                <div style="display: flex; flex-direction: column; align-items: center; min-width: 60px;">
+                                    <span id="notif-days-value" style="font-weight: 800; color: var(--primary-color); font-size: 1.5rem; line-height: 1;">3</span>
+                                    <small style="font-weight: 600; font-size: 0.7rem; color: var(--text-muted);">GÜN</small>
+                                </div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 12px;">
+                                <i class="fa-solid fa-circle-info"></i> Ödeme tarihine belirlediğiniz gün sayısı kadar kaldığında cihazınıza bildirim gönderilir.
+                            </p>
+                        </div>
+                
+                        <button id="save-notif-settings-btn" class="btn-primary" style="width: auto; padding: 12px 35px; box-shadow: 0 4px 15px rgba(74, 108, 247, 0.2);">
+                            <i class="fa-solid fa-floppy-disk"></i> Bildirim Tercihlerini Kaydet
+                        </button>
+                    </div>
+                </div>
                 </div>
 
             </div>
