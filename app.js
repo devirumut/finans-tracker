@@ -10,7 +10,6 @@ let driveFileId = null;
 let editingId = null; 
 let editingCategoryId = null;
 let expenseChartInstance = null; 
-let notificationDays = parseInt(localStorage.getItem('notificationDays')) || 3;
 
 // ==========================================
 // 2. DOM ELEMENTLERİ
@@ -64,6 +63,86 @@ const catListEl = document.getElementById('category-list');
 // YENİ PROJEEE/app.js - Dinamik Grafik Butonları (GÜNCELLENDİ)
 const chartBtns = document.querySelectorAll('.chart-btn');
 let currentChartType = localStorage.getItem('chartType') || 'doughnut';
+
+// ==========================================
+// 🔔 BİLDİRİM AYARLARI VE NATIVE PUSH MOTORU
+// ==========================================
+let notifyUIEnabled = localStorage.getItem('notifyUIEnabled') !== 'false'; 
+let notifyReminderEnabled = localStorage.getItem('notifyReminderEnabled') !== 'false'; 
+
+const notifyUIEl = document.getElementById('setting-notify-ui');
+const notifyReminderEl = document.getElementById('setting-notify-reminder');
+const saveNotifBtn = document.getElementById('save-notif-settings-btn');
+
+// Arayüz yüklendiğinde butonların durumunu ayarla
+if(notifyUIEl) notifyUIEl.checked = notifyUIEnabled;
+if(notifyReminderEl) notifyReminderEl.checked = notifyReminderEnabled;
+
+// 🚀 NATIVE PUSH: Kullanıcıdan İzin İsteme Fonksiyonu
+async function requestPushPermission() {
+    if (!("Notification" in window)) {
+        showNotify("Tarayıcınız bildirimleri desteklemiyor.", "fa-circle-xmark");
+        return false;
+    }
+    if (Notification.permission === "granted") return true;
+
+    if (Notification.permission !== "denied") {
+        const permission = await Notification.requestPermission();
+        return permission === "granted";
+    }
+    return false;
+}
+
+// 🚀 NATIVE PUSH: Gerçek İşletim Sistemi Bildirimi Gönderme Fonksiyonu
+function sendNativePush(title, body) {
+    if (Notification.permission === "granted" && notifyReminderEnabled) {
+        // PWA ve mobil cihazlarda en stabil yöntem Service Worker üzerinden göndermektir
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(title, {
+                body: body,
+                icon: "./icon-192.png", // Uygulamanın ikonu
+                badge: "./icon-192.png", // Android üst barda görünen küçük ikon
+                vibrate: [200, 100, 200] // Telefonu titreştir
+            });
+        }).catch(err => {
+            // Eğer Service Worker hazır değilse standart yöntemle gönder
+            new Notification(title, { body: body, icon: "./icon-192.png" });
+        });
+    }
+}
+
+// Ayarları Kaydetme Butonu (Güncellendi)
+if(saveNotifBtn) {
+    saveNotifBtn.onclick = async () => {
+        // Kullanıcı hatırlatıcıları açmak istiyorsa, önce tarayıcıdan izin isteyelim
+        if (notifyReminderEl.checked && Notification.permission !== "granted") {
+            const granted = await requestPushPermission();
+            if (!granted) {
+                showNotify("İşletim sistemi bildirimlerine izin vermelisiniz!", "fa-triangle-exclamation");
+                notifyReminderEl.checked = false; // İzin verilmediyse butonu geri kapat
+            } else {
+                // İzin ilk kez verildiğinde test bildirimi gönder
+                sendNativePush("Harika! 🚀", "Finans Asistanı bildirimleri başarıyla aktifleştirildi.");
+            }
+        }
+
+        notifyUIEnabled = notifyUIEl.checked;
+        notifyReminderEnabled = notifyReminderEl.checked;
+        
+        localStorage.setItem('notifyUIEnabled', notifyUIEnabled);
+        localStorage.setItem('notifyReminderEnabled', notifyReminderEnabled);
+        
+        checkUpcomingPayments();
+        
+        // Sadece ekranda (Toast) uyarı göster
+        const tempState = notifyUIEnabled;
+        notifyUIEnabled = true; 
+        showNotify("Bildirim ayarları başarıyla kaydedildi!", "fa-check");
+        notifyUIEnabled = tempState;
+        
+        if(accessToken) backupToDrive(true);
+    };
+}
 
 function updateChartSelectionUI() {
     chartBtns.forEach(btn => {
@@ -205,6 +284,7 @@ function setDefaultDate() {
 
 let notifyTimeout;
 function showNotify(message, icon = 'fa-circle-check') {
+    if (!notifyUIEnabled) return; // BİLDİRİMLER KAPALIYSA ÇALIŞMAYI DURDUR
     // Kutuyu site ilk açıldığında değil, bildirim gerektiği an arayıp buluyoruz!
     const bildirimKutusu = document.getElementById('notification');
     
@@ -971,59 +1051,56 @@ if(subForm) {
     };
 }
 
-// YENİ PROJEEE/app.js - Güncellenmiş ve Bug'dan Arındırılmış Motor
 function checkUpcomingPayments() {
     const container = document.getElementById('payment-reminders-container');
-    if(!container) return;
+    if(!container || !notifyReminderEnabled) { 
+        if(container) container.style.display = 'none'; 
+        return; 
+    }
+    
     container.innerHTML = '';
     container.style.display = 'none';
 
     const today = new Date();
     const currentDay = today.getDate();
     const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    const todayStr = today.toISOString().split('T')[0];
 
     let remindersHTML = '';
     let hasReminders = false;
+
+    // Her gün aynı bildirimi defalarca atmamak için basit bir kontrol mekanizması
+    const lastPushDate = localStorage.getItem('lastPushDate');
+    const todayString = today.toISOString().split('T')[0];
+    let shouldSendPush = (lastPushDate !== todayString);
 
     subscriptions.forEach(sub => {
         if(!sub.day) return;
         let targetDay = sub.day > daysInMonth ? daysInMonth : sub.day;
         let diff = targetDay - currentDay;
 
-        if (diff >= 0 && diff <= notificationDays) { 
+        if (diff >= 0 && diff <= 3) {
             hasReminders = true;
-            // DÜZELTİLEN SATIR BURASI: timeText değişkenini geri ekledik
             let timeText = diff === 0 ? "Bugün!" : `${diff} gün sonra`;
+            let msg = `${sub.name} ödemesi yaklaştı (${timeText})`;
             
-            // 1. Ekran İçi Uyarıyı Oluştur
+            // Ekrana basılacak HTML
             remindersHTML += `
                 <div class="reminder-alert">
                     <i class="fa-solid fa-bell-concierge fa-shake"></i>
                     <span><strong>${sub.name}</strong> ödemesi yaklaştı <strong>(${timeText})</strong></span>
                 </div>`;
                 
-            // 2. CİHAZA YEREL BİLDİRİM (PUSH) GÖNDER
-            if ("Notification" in window && Notification.permission === "granted") {
-                const notifKey = `notified_${sub.id}_${todayStr}`;
-                
-                if (!localStorage.getItem(notifKey)) {
-                    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-                        navigator.serviceWorker.ready.then(reg => {
-                            reg.showNotification('Fatura Hatırlatıcı 🔔', {
-                                body: `${sub.name} ödemeniz yaklaştı (${timeText}). Bütçenizi kontrol edin!`,
-                                icon: 'icon-192.png',
-                                badge: 'icon-192.png',
-                                vibrate: [200, 100, 200, 100, 200],
-                                tag: 'bill-reminder'
-                            });
-                        });
-                    }
-                    localStorage.setItem(notifKey, 'true');
-                }
+            // 🚀 Gerçek Telefon Bildirimini Gönder (Günde sadece 1 kez)
+            if (shouldSendPush) {
+                sendNativePush("💳 Ödeme Hatırlatması", msg);
             }
         }
     });
+
+    // Eğer bugün bildirim gönderildiyse tarihi kaydet ki bugün bir daha atmasın
+    if (hasReminders && shouldSendPush) {
+        localStorage.setItem('lastPushDate', todayString);
+    }
 
     if(hasReminders) {
         container.style.display = 'flex';
@@ -1815,69 +1892,4 @@ function renderTrendChart(selectedNameLowerCase) {
             }
         }
     });
-}
-
-// ==========================================
-// 🔔 NATIVE (YEREL) BİLDİRİM İZNİ SİSTEMİ
-// ==========================================
-const enableNotifBtn = document.getElementById('enable-notifications-btn');
-if (enableNotifBtn) {
-    // Sayfa açıldığında zaten izin verildiyse butonu pasif ve yeşil yap
-    if (("Notification" in window) && Notification.permission === 'granted') {
-        enableNotifBtn.innerText = "Bildirimler Aktif";
-        enableNotifBtn.style.opacity = "0.7";
-        enableNotifBtn.disabled = true;
-    }
-
-    enableNotifBtn.addEventListener('click', async () => {
-        if (!("Notification" in window)) {
-            showNotify("Tarayıcınız bildirimleri desteklemiyor.", "fa-triangle-exclamation");
-            return;
-        }
-        
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-            enableNotifBtn.innerText = "Bildirimler Aktif";
-            enableNotifBtn.style.opacity = "0.7";
-            enableNotifBtn.disabled = true;
-            showNotify("Cihaz bildirimlerine izin verildi!", "fa-bell");
-            
-            // Hoş geldin bildirimi yolla
-            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.showNotification('FinansTracker', {
-                        body: "Artık faturalarınızı kilit ekranından takip edebilirsiniz!",
-                        icon: 'icon-192.png',
-                        vibrate: [100, 50, 100]
-                    });
-                });
-            }
-        } else {
-            showNotify("Bildirim izni reddedildi.", "fa-circle-xmark");
-        }
-    });
-}
-
-// ==========================================
-// 🔔 BİLDİRİM AYARLARI KONTROLÜ
-// ==========================================
-const notifRange = document.getElementById('notif-days-range');
-const notifValue = document.getElementById('notif-days-value');
-const saveNotifBtn = document.getElementById('save-notif-settings-btn');
-
-if(notifRange) {
-    notifRange.value = notificationDays;
-    notifValue.innerText = notificationDays;
-    // Kaydırırken anlık sayıyı güncelle
-    notifRange.oninput = () => notifValue.innerText = notifRange.value;
-}
-
-if(saveNotifBtn) {
-    saveNotifBtn.onclick = () => {
-        notificationDays = parseInt(notifRange.value);
-        localStorage.setItem('notificationDays', notificationDays);
-        showNotify(`${notificationDays} gün kala hatırlatma ayarlandı!`, "fa-check");
-        checkUpcomingPayments(); // Ayar değişince hatırlatıcıyı tekrar çalıştır
-        if(accessToken) backupToDrive(true); // Drive'a yedekle
-    };
 }
