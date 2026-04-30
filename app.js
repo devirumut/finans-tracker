@@ -79,19 +79,6 @@ const menuDocuments = document.getElementById('menu-documents');
 const documentsView = document.getElementById('documents-view');
 let documents = JSON.parse(localStorage.getItem('documents')) || [];
 
-const ADMIN_EMAIL = "devirumut@gmail.com"; 
-let adminSettings = JSON.parse(localStorage.getItem('adminSettings')) || {
-    bannerText: "Finans Asistanı V4.0",
-    appLogo: "💰"
-};
-
-function applyAdminSettings() {
-    const bannerEl = document.querySelector('#mobile-header h2');
-    if (bannerEl) bannerEl.innerText = adminSettings.bannerText;
-    const link = document.querySelector("link[rel*='icon']");
-    if (link) link.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${adminSettings.appLogo}</text></svg>`;
-}
-
 // YENİ PROJEEE/app.js 
 let userSalary = parseFloat(localStorage.getItem('userSalary')) || 0;
 let userWorkHours = parseFloat(localStorage.getItem('userWorkHours')) || 160;
@@ -242,14 +229,10 @@ if (hamburgerBtn && sidebar && mobileOverlay) {
     mobileOverlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); mobileOverlay.classList.remove('active'); });
 }
 
-// switchMenu fonksiyonunu bu listeyle güncelle:
+// switchMenu fonksiyonu içine documents ekle
 function switchMenu(activeMenuBtn, activeViewDiv) {
-    const menuAdmin = document.getElementById('menu-admin');
-    const adminView = document.getElementById('admin-view');
-
-    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuDocuments, menuSettings, menuTrends, menuAdmin].forEach(btn => { if(btn) btn.classList.remove('active'); });
-    [dashboardView, calendarView, yearlyView, notesView, documentsView, settingsView, trendsView, adminView].forEach(view => { if(view) view.style.display = 'none'; });
-    
+    [menuDashboard, menuCalendar, menuYearly, menuNotes, menuDocuments, menuSettings, menuTrends].forEach(btn => { if(btn) btn.classList.remove('active'); });
+    [dashboardView, calendarView, yearlyView, notesView, documentsView, settingsView, trendsView].forEach(view => { if(view) view.style.display = 'none'; });
     if(activeMenuBtn) activeMenuBtn.classList.add('active');
     if(activeViewDiv) activeViewDiv.style.display = 'flex';
 
@@ -281,23 +264,12 @@ settingsTabs.forEach(tab => {
 // ==========================================
 // 7. GOOGLE DRİVE VE GİRİŞ SİSTEMİ
 // ==========================================
-// fetchUserProfile fonksiyonunu bu admin kontrolüyle güncelle:
 async function fetchUserProfile() {
     try {
         const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': `Bearer ${accessToken}` } });
         const user = await response.json();
-        document.getElementById('user-photo').src = user.picture; 
-        document.getElementById('user-name').innerText = user.name;
-        document.getElementById('login-container').style.display = 'none'; 
-        document.getElementById('user-profile').style.display = 'flex';
-
-        // 🛡️ Admin Kontrolü
-        const adminBtn = document.getElementById('menu-admin');
-        if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-            if(adminBtn) adminBtn.style.display = 'flex';
-            showNotify("Yönetici modunda giriş yapıldı!", "fa-user-shield");
-        }
-
+        document.getElementById('user-photo').src = user.picture; document.getElementById('user-name').innerText = user.name;
+        document.getElementById('login-container').style.display = 'none'; document.getElementById('user-profile').style.display = 'flex';
         showNotify(`Hoş geldin, ${user.given_name}!`, 'fa-face-smile');
     } catch (error) { console.error("Profil alınamadı:", error); }
 }
@@ -1909,28 +1881,3 @@ if(saveNotifBtn) {
         if(accessToken) backupToDrive(true); // Drive'a yedekle
     };
 }
-
-// Admin Paneline Geçiş
-const menuAdmin = document.getElementById('menu-admin');
-const adminView = document.getElementById('admin-view');
-if (menuAdmin) {
-    menuAdmin.onclick = (e) => {
-        e.preventDefault();
-        switchMenu(menuAdmin, adminView);
-        document.getElementById('admin-banner-input').value = adminSettings.bannerText;
-        document.getElementById('admin-logo-input').value = adminSettings.appLogo;
-    };
-}
-
-const saveAdminBtn = document.getElementById('save-admin-settings');
-if (saveAdminBtn) {
-    saveAdminBtn.onclick = () => {
-        adminSettings.bannerText = document.getElementById('admin-banner-input').value;
-        adminSettings.appLogo = document.getElementById('admin-logo-input').value;
-        localStorage.setItem('adminSettings', JSON.stringify(adminSettings));
-        applyAdminSettings();
-        showNotify("Sistem ayarları güncellendi!", "fa-rocket");
-        if(accessToken) backupToDrive(true);
-    };
-}
-applyAdminSettings();

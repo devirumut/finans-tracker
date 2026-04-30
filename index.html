@@ -16,7 +16,7 @@
         <div id="mobile-header">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <i class="fa-solid fa-wallet" style="color: var(--primary-color); font-size: 1.5rem;"></i>
-                <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-main);">Finans Asistanı V4.1</h2>
+                <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-main);">Finans Asistanı V3.5</h2>
             </div>
             <button id="hamburger-btn"><i class="fa-solid fa-bars-staggered"></i></button>
         </div>
@@ -48,7 +48,6 @@
                 <a href="#" id="menu-notes"><i class="fa-solid fa-note-sticky"></i> Notlarım</a>
                 <a href="#" id="menu-documents"><i class="fa-solid fa-file-invoice"></i> Belgeler</a>
                 <a href="#" id="menu-settings"><i class="fa-solid fa-gear"></i> Ayarlar</a>
-                <a href="#" id="menu-admin" style="display: none;"><i class="fa-solid fa-user-shield"></i> Admin Paneli</a>
                 
                 <div style="margin-top: auto; padding-top: 20px; display: flex; gap: 10px;">
                     <button id="fetch-btn" class="btn-primary cloud-btn">
@@ -503,33 +502,11 @@
                         </button>
                     </div>
                 </div>
-            </div> <div id="admin-view" style="display: none; flex-direction: column; flex: 1; gap: 20px; padding: 20px;">
-                <header class="header-section">
-                    <h1>Sistem Yönetimi 🛡️</h1>
-                    <p>Site başlığını ve ikonları buradan dinamik olarak değiştirin.</p>
-                </header>
-            
-                <div class="card" style="max-width: 600px;">
-                    <h3 style="margin-bottom: 20px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Görünüm Ayarları</h3>
-                    
-                    <div class="form-group">
-                        <label>Site Banner Metni</label>
-                        <input type="text" id="admin-banner-input" class="form-control" placeholder="Örn: Finans Tracker V4.0">
-                    </div>
-            
-                    <div class="form-group">
-                        <label>Uygulama İkonu (Emoji)</label>
-                        <input type="text" id="admin-logo-input" class="form-control" placeholder="Örn: 💸, 💰, 🏦">
-                        <small style="color: var(--text-muted);">Bu emoji sitenin mobil simgesi ve faviconu olacaktır.</small>
-                    </div>
-            
-                    <button id="save-admin-settings" class="btn-primary" style="margin-top: 10px;">
-                        <i class="fa-solid fa-check-double"></i> Değişiklikleri Yayınla
-                    </button>
                 </div>
-            </div>
 
-        </main> </div>
+            </div>
+        </main>
+    </div>
 
     <div id="logout-modal" class="modal-overlay">
         <div class="modal-content">
