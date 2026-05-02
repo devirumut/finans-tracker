@@ -1,0 +1,437 @@
+/* Mobile: responsive ve mobil menü kuralları */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        padding: 20px;
+        box-shadow: none;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .menu {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+    .google-btn {
+        margin-top: 20px;
+    }
+    .main-content {
+        padding: 20px;
+    }
+    
+}
+
+@media (max-width: 900px) {
+    .horizontal-form { grid-template-columns: 1fr; } /* Mobilde hepsi alt alta */
+    .bottom-grid { grid-template-columns: 1fr; } /* Liste ve grafik alt alta */
+}
+
+@media (max-width: 850px) {
+    /* 1. KESİN SCROLL İZNİ */
+    body, html { height: auto !important; overflow-x: hidden !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
+    .app-container { display: block !important; height: auto !important; min-height: 100vh !important; overflow: visible !important; }
+    .main-content { padding: 15px 10px 40px 10px !important; height: auto !important; overflow: visible !important; display: flex !important; flex-direction: column !important; }
+
+    /* --- YENİ: SIFIRLAMA VE EŞİT BOŞLUK SİSTEMİ --- */
+    /* Sayfadaki tüm ekranların kutular arası boşluğunu sabit 15px yapıyoruz */
+    #dashboard-view, #yearly-view, #notes-view, #settings-view {
+        gap: 15px !important; 
+    }
+    /* HTML kodunun içinde yazan o eski devasa marginleri ezip sıfırlıyoruz */
+    #dashboard-view > *, #yearly-view > *, #notes-view > *, #settings-view > * {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* 2. HAMBURGER MENÜ VE ÜST BAR */
+    #mobile-header {
+        display: flex !important; align-items: center; justify-content: space-between;
+        padding: 12px 20px; position: sticky; top: 0; background: rgba(255, 255, 255, 0.85); z-index: 1000;
+        backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    body.dark-mode #mobile-header { background: rgba(30, 41, 59, 0.85); }
+    #hamburger-btn { background: rgba(74, 108, 247, 0.1); border: none; width: 42px; height: 42px; border-radius: 12px; font-size: 1.3rem; color: var(--primary-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+    #hamburger-btn:active { transform: scale(0.9); }
+    
+    .sidebar { position: fixed !important; top: 0 !important; left: -300px !important; width: 260px !important; height: 100vh !important; z-index: 9999 !important; transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important; border-radius: 0 !important; border-right: none !important; display: flex !important; box-shadow: 5px 0 20px rgba(0,0,0,0.2) !important; }
+    .sidebar.mobile-open { left: 0 !important; }
+    .sidebar-header, .user-profile-section, #logout-btn { display: flex !important; }
+    .menu { flex-direction: column !important; height: auto !important; align-items: stretch !important; padding: 0 15px !important; overflow-y: auto; }
+    .menu a { flex-direction: row !important; justify-content: flex-start !important; padding: 12px 15px !important; }
+    #mobile-overlay.active { display: block !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
+
+    /* 3. ALTIN/DÖVİZ YATAY KAYDIRMA */
+    .header-section { flex-direction: column !important; align-items: flex-start !important; gap: 10px; }
+    .header-section h1 { font-size: 1.4rem !important; }
+    .header-section > div:nth-child(2) { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; width: 100%; padding-bottom: 10px; gap: 10px !important; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .header-section > div:nth-child(2)::-webkit-scrollbar { display: none; }
+    .gold-mask-wrapper { flex: 0 0 auto !important; transform: scale(0.85); transform-origin: left top; margin-right: -30px; margin-bottom: -15px;}
+
+    /* 4. ANA KARTLAR */
+    .dashboard-cards { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+    .balance-card { grid-column: span 2 !important; padding: 15px !important; text-align: center;}
+    .balance-card h2 { font-size: 1.6rem !important; }
+    .income-card, .expense-card { padding: 12px 10px !important; text-align: center;}
+    .card h3 { font-size: 0.75rem !important; justify-content: center; margin-bottom: 5px !important; }
+    .income-card h2, .expense-card h2 { font-size: 1.1rem !important; }
+
+    /* AYLIK HARCAMA BARI */
+    #income-expense-tracker-card { padding: 15px !important; }
+
+    /* 5. GİRİŞ FORMU */
+    .transaction-form-section { padding: 15px !important; }
+    .horizontal-form { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+    .type-selector { grid-column: span 2 !important; display: flex !important; gap: 10px !important; margin-bottom: 5px !important; }
+    .type-btn { padding: 10px !important; font-size: 0.85rem !important; }
+    .horizontal-form .form-group { margin: 0 !important; }
+    .horizontal-form input, .horizontal-form select { width: 100% !important; height: 45px !important; padding: 10px !important; font-size: 16px !important; }
+    .horizontal-form button[type="submit"] { grid-column: span 2 !important; height: 45px !important; font-size: 1.1rem !important; }
+
+    /* 6. TABLO VE GRAFİK ALANI */
+    .bottom-split-area { display: flex !important; flex-direction: column !important; gap: 15px !important; }
+    .history-card { width: 100% !important; flex: none !important; max-height: 400px !important; padding: 15px !important;}
+    .chart-box { width: 100% !important; flex: none !important; padding: 15px !important; }
+    .chart-container { min-height: 180px !important; max-height: 180px !important; }
+
+    /* FERAH KART TABLO GÖRÜNÜMÜ */
+    .transaction-item { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding: 12px !important; }
+    .transaction-info { width: 100% !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
+    .transaction-item > div:nth-child(2) { width: 100% !important; justify-content: space-between !important; padding-top: 8px !important; border-top: 1px dashed rgba(0,0,0,0.1) !important; }
+    body.dark-mode .transaction-item > div:nth-child(2) { border-top-color: rgba(255,255,255,0.1) !important; }
+
+    /* 7. AYARLAR VE NOTLAR */
+    .settings-tabs { flex-direction: column !important; gap: 5px; }
+    .settings-tab-btn { width: 100% !important; padding: 12px !important; text-align: left; }
+    #tab-general > div > div:nth-child(2) { grid-template-columns: 1fr !important; gap: 15px !important; }
+    .modal-content { width: 95% !important; padding: 20px !important; }
+    #notes-grid { grid-template-columns: 1fr !important; }
+}
+
+
+@media (max-width: 850px) {
+    .market-strip {
+        flex-wrap: nowrap !important;
+        align-items: stretch !important;
+    }
+
+    .market-card {
+        flex: 0 0 175px !important;
+        min-width: 175px !important;
+        padding: 13px 14px !important;
+    }
+
+    .market-card-value {
+        font-size: 1.25rem !important;
+    }
+}
+
+
+@media (max-width: 850px) {
+    .category-manage-item {
+        align-items: stretch !important;
+    }
+
+    .category-manage-info {
+        width: 100% !important;
+    }
+
+    .category-manage-title {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .category-manage-actions {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 8px;
+        border-top: 1px dashed rgba(148, 163, 184, 0.24);
+    }
+
+    .settings-tab-content .transaction-form-section {
+        border-radius: 16px !important;
+    }
+}
+
+
+/* ========================================= */
+/* VARYANT 2 · MOBİL PREMIUM SON KATMAN */
+/* ========================================= */
+@media (max-width: 850px) {
+    #mobile-header {
+        background: rgba(255, 255, 255, 0.82) !important;
+        backdrop-filter: blur(18px) saturate(150%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+        border-bottom: 1px solid var(--glass-border) !important;
+    }
+
+    body.dark-mode #mobile-header {
+        background: rgba(15, 23, 42, 0.86) !important;
+    }
+
+    #hamburger-btn {
+        background: var(--premium-gradient) !important;
+        color: white !important;
+        box-shadow: 0 12px 26px rgba(37, 99, 235, 0.20);
+    }
+
+    .card,
+    .transaction-form-section,
+    .history-card,
+    .chart-box,
+    .settings-tabs {
+        border-radius: 18px !important;
+    }
+
+    .gold-mask-wrapper {
+        min-width: 176px;
+    }
+
+    .dashboard-cards {
+        gap: 12px !important;
+    }
+
+    .horizontal-form input,
+    .horizontal-form select {
+        border-radius: 14px !important;
+    }
+
+    .category-manage-actions {
+        justify-content: flex-end !important;
+    }
+}
+
+
+/* ========================================= */
+/* MOBİL ÖZET KART YAZI BOYUTU DÜZELTMESİ */
+/* ========================================= */
+@media (max-width: 850px) {
+    .dashboard-cards .card {
+        min-height: 112px !important;
+        padding: 16px 14px !important;
+    }
+
+    .dashboard-cards .card h3 {
+        font-size: 0.88rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 8px !important;
+        justify-content: center !important;
+    }
+
+    .balance-card h2 {
+        font-size: clamp(1.85rem, 7vw, 2.25rem) !important;
+        line-height: 1.12 !important;
+        white-space: nowrap !important;
+    }
+
+    .income-card h2,
+    .expense-card h2 {
+        font-size: clamp(1.35rem, 5.2vw, 1.7rem) !important;
+        line-height: 1.12 !important;
+        white-space: nowrap !important;
+    }
+
+    .income-card,
+    .expense-card {
+        min-height: 104px !important;
+        padding: 15px 10px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .balance-card h2 {
+        font-size: 1.65rem !important;
+    }
+
+    .income-card h2,
+    .expense-card h2 {
+        font-size: 1.18rem !important;
+    }
+
+    .dashboard-cards .card h3 {
+        font-size: 0.8rem !important;
+    }
+}
+
+
+/* ========================================= */
+/* MOBİL ÖZET KARTLARI NET BÜYÜTME */
+/* ========================================= */
+@media (max-width: 850px) {
+    .dashboard-cards {
+        gap: 12px !important;
+    }
+
+    .dashboard-cards .card {
+        min-height: 132px !important;
+        padding: 18px 14px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+
+    .dashboard-cards .card h3 {
+        font-size: 1rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 10px !important;
+        font-weight: 800 !important;
+        justify-content: center !important;
+    }
+
+    .balance-card {
+        min-height: 142px !important;
+        padding: 20px 16px !important;
+    }
+
+    .balance-card h2 {
+        font-size: clamp(2.15rem, 9.4vw, 3rem) !important;
+        line-height: 1.05 !important;
+        white-space: nowrap !important;
+        letter-spacing: -0.055em !important;
+    }
+
+    .income-card h2,
+    .expense-card h2 {
+        font-size: clamp(1.62rem, 7.2vw, 2.15rem) !important;
+        line-height: 1.06 !important;
+        white-space: nowrap !important;
+        letter-spacing: -0.05em !important;
+    }
+
+    .income-card,
+    .expense-card {
+        min-height: 124px !important;
+        padding: 18px 10px !important;
+    }
+
+    .dashboard-cards .card h2 {
+        position: relative;
+        z-index: 2;
+    }
+}
+
+@media (max-width: 420px) {
+    .dashboard-cards .card {
+        min-height: 124px !important;
+        padding: 16px 9px !important;
+    }
+
+    .dashboard-cards .card h3 {
+        font-size: 0.92rem !important;
+    }
+
+    .balance-card h2 {
+        font-size: clamp(1.95rem, 8.8vw, 2.55rem) !important;
+    }
+
+    .income-card h2,
+    .expense-card h2 {
+        font-size: clamp(1.42rem, 6.6vw, 1.85rem) !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .balance-card h2 {
+        font-size: 1.78rem !important;
+    }
+
+    .income-card h2,
+    .expense-card h2 {
+        font-size: 1.28rem !important;
+    }
+
+    .dashboard-cards .card h3 {
+        font-size: 0.84rem !important;
+    }
+}
+
+
+/* ========================================= */
+/* MOBİL ÖZET KART YÜKSEKLİĞİ SIKILAŞTIRMA */
+/* ========================================= */
+@media (max-width: 850px) {
+    .dashboard-cards .card {
+        min-height: 112px !important;
+        padding: 13px 12px !important;
+    }
+
+    .balance-card {
+        min-height: 120px !important;
+        padding: 15px 14px !important;
+    }
+
+    .income-card,
+    .expense-card {
+        min-height: 106px !important;
+        padding: 13px 9px !important;
+    }
+
+    .dashboard-cards .card h3 {
+        margin-bottom: 7px !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .dashboard-cards .card {
+        min-height: 106px !important;
+        padding: 12px 8px !important;
+    }
+
+    .balance-card {
+        min-height: 114px !important;
+    }
+
+    .income-card,
+    .expense-card {
+        min-height: 100px !important;
+    }
+}
+
+
+/* ========================================= */
+/* BELGE KARTI AKSİYONLARI - MOBİL */
+/* ========================================= */
+@media (max-width: 850px) {
+    .doc-card {
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .doc-actions {
+        width: 100%;
+        flex-direction: row !important;
+        justify-content: flex-end;
+        margin-top: 6px;
+    }
+
+    .doc-action-btn {
+        min-width: 84px !important;
+        padding: 9px 10px !important;
+        border-radius: 13px !important;
+    }
+
+    .doc-action-btn span {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .doc-card {
+        flex-wrap: wrap;
+    }
+
+    .doc-info {
+        min-width: calc(100% - 70px);
+    }
+
+    .doc-actions {
+        justify-content: flex-start;
+        margin-left: 66px;
+    }
+
+    .doc-action-btn {
+        min-width: 78px !important;
+        padding: 8px 10px !important;
+    }
+}

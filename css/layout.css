@@ -1,0 +1,291 @@
+/* Layout: ana sayfa, sidebar ve genel yerleşim */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- ANA YAPI VE LAYOUT --- */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR MODERNİZE --- */
+.sidebar {
+    width: 280px;
+    background-color: #1e293b; /* Koyu, kurumsal bir lacivert */
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+    z-index: 10;
+    color: #f8fafc;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #94a3b8;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.menu a:hover, .menu a.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 10px 20px rgba(74, 108, 247, 0.2);
+}
+
+/* --- ANA İÇERİK ALANI --- */
+.main-content {
+    flex: 1;
+    padding: 40px 50px;
+    overflow-y: auto;
+}
+
+/* --- DASHBOARD KARTLARI (Bakiye, Gelir, Gider) --- */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* --- İÇERİK IZGARASI (Form ve Liste) --- */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 30px;
+}
+
+/* Arka planların ve renklerin aniden değil, yumuşakça değişmesi için: */
+body, .sidebar, .card, header, select, input, .transaction-item {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* --- SİTEYİ TEK EKRANA SIĞDIRMA (KAYMAYI ENGELLEME) --- */
+body {
+    overflow: hidden; /* Tüm sayfanın aşağı kaymasını kesin olarak engeller */
+}
+
+.app-container, .main-content {
+    height: 100vh; /* Ekranın tam boyu kadar yer kaplar */
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px; /* Ekrana tam sığması için boşlukları biraz kıstık */
+}
+
+.content-grid {
+    flex: 1; /* Ekranda kalan tüm boşluğu kaplar */
+    min-height: 0; /* Flexbox'ın dışarı taşmasını önler */
+}
+
+/* --- SİTEYİ TEK EKRANA SIĞDIRMA (KAYMAYI ENGELLEME) --- */
+body {
+    overflow: hidden; /* Tüm sayfanın aşağı kaymasını kesin olarak engeller */
+}
+
+.app-container, .main-content {
+    height: 100vh; /* Ekranın tam boyu kadar yer kaplar */
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px; /* Ekrana tam sığması için boşlukları biraz kıstık */
+}
+
+.content-grid {
+    flex: 1; /* Ekranda kalan tüm boşluğu kaplar */
+    min-height: 0; /* Flexbox'ın dışarı taşmasını önler */
+}
+
+/* Formu tek satırda yan yana diziyoruz */
+.horizontal-form {
+    display: grid;
+    grid-template-columns: 1.2fr 1.5fr 1fr 1.2fr 1fr 0.8fr; /* 6 elemanı oranlı böler */
+    gap: 15px;
+    align-items: end; /* Tüm kutuları alt çizgiden hizalar */
+}
+
+/* --- KESİN TEK SAYFA (NO-SCROLL) MİMARİSİ --- */
+body {
+    overflow: hidden !important; /* Tüm sayfanın kaymasını KESİNLİKLE engeller */
+    height: 100vh;
+}
+
+.app-container {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px 30px;
+    gap: 15px; /* Sırâlar arasındaki boşluk */
+    overflow: hidden;
+}
+
+/* İlk 3 sıranın boyutlarını sabitliyoruz (Sıkışmasınlar) */
+.header-section, .dashboard-cards, .transaction-form-section {
+    flex-shrink: 0; 
+    margin-bottom: 0 !important;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Kartları biraz inceltiyoruz ki ekranda yer kalsın */
+.dashboard-cards .card { padding: 15px 20px; }
+
+.dashboard-cards h2 { font-size: 1.8rem; }
+
+.horizontal-form {
+    display: grid;
+    grid-template-columns: 1.2fr 1.5fr 1fr 1fr 1fr 0.8fr;
+    gap: 15px;
+    align-items: center;
+}
+
+.horizontal-form .form-group { margin-bottom: 0; }
+
+/* 4. SIRA (ALT BÖLÜM): Kalan tüm alanı kaplar ve içindekiler kayar */
+.bottom-split-area {
+    display: flex;
+    gap: 20px;
+    flex: 1; /* Alt kısmı tamamen doldur */
+    min-height: 0; /* İçeriğin ekranı taşırmasını engeller */
+}
+
+/* Tüm siteyi kasan gereksiz "transition: all" kodunu siliyoruz ve sadece renk değişimine izin veriyoruz */
+body, .sidebar, .card, header, select, input, .transaction-item {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
+}
+
+/* 4. Tema (Renk) Değişiminde Yağ Gibi Akma (Süre 0.5s'ye uzatıldı) */
+body, .sidebar, .card, header, select, input, .transaction-item {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Alt paneldeki yerleşim oranlarını güncelliyoruz */
+.bottom-split-area {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start; /* Elemanların boyu içeriğe göre esner */
+}
+
+/* ========================================= */
+/* 📜 İŞLEM GEÇMİŞİ VE EKRAN TAŞMA YAMASI 📜 */
+/* ========================================= */
+
+/* 1. Alt Paneli Ekrana Sığacak Şekilde Kilitliyoruz */
+.bottom-split-area {
+    display: flex;
+    gap: 20px;
+    align-items: stretch; 
+    flex: 1; 
+    min-height: 0; 
+    margin-bottom: 10px;
+}
+
+/* ========================================= */
+/* 🚀 PC: SAĞ TARAF SCROLL VE SABİT MENÜ YAMASI 🚀 */
+/* ========================================= */
+
+/* 1. Sayfa Kaydırma Kilidini Kır (Tüm Sayfa Kayabilsin) */
+html, body {
+    overflow-y: auto !important; 
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+.app-container {
+    display: flex !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+}
+
+/* 2. Sol Menüyü Kesin Olarak Sabitle */
+.sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    height: 100dvh !important;
+    overflow-y: auto !important; /* Menü uzarsa kendi içinde kayar */
+    z-index: 1000 !important;
+}
+
+/* Sol menünün çirkin scroll çubuğunu gizle */
+.sidebar::-webkit-scrollbar { display: none !important; }
+
+/* 3. Sağ Tarafı Özgür Bırak */
+.main-content {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important; 
+    display: block !important; 
+}
+
+/* Kutuların Sıkışmasını ve Donmasını Önle */
+.content-grid, .bottom-split-area, .transaction-history-section, .history-card, .chart-box {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* ========================================= */
+/* ✨ MENÜ VE SAYFA GEÇİŞ EFEKTLERİ YAMASI ✨ */
+/* ========================================= */
+
+/* 1. Menü Butonları (Özet, Takvim vb.) Pürüzsüz Hover ve Aktif Efekti */
+.menu a {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.menu a:active {
+    transform: scale(0.95) !important; /* Tıklarken hafifçe içe göçme (Dokunma hissi) */
+}
+
+
+/* ========================================= */
+/* VARYANT 2 · PREMIUM MODERN LAYOUT SON KATMAN */
+/* ========================================= */
+@media (min-width: 851px) {
+    .main-content {
+        padding: 28px 38px 72px 38px !important;
+    }
+
+    .header-section {
+        gap: 24px;
+    }
+
+    .bottom-split-area {
+        gap: 22px !important;
+    }
+
+    .dashboard-cards {
+        gap: 20px !important;
+    }
+}
